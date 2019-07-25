@@ -28,13 +28,42 @@ jobs:
           keys:
           - cargo-target-v1-{{ checksum "Cargo.lock" }}
       - run:
+          name: Install dependencies
+          command: |
+            command -v wasm-build || cargo install pwasm-utils-cli --version 0.6.0 --bin wasm-build
+
+            wget https://releases.parity.io/ethereum/v2.6.0/x86_64-unknown-linux-gnu/parity
+            echo "1b50cabc8ce54983d1b10be4c4f5887ff4ecfe63177e6c49cde819a563fb9d96  parity" > parity.sum
+            sha256sum parity.sum
+            chmod +x parity
+
+      - run:
           name: Check formatting
           command: |
             cargo fmt -- --check
       - run:
           name: Build
           command: |
-            RUSTFLAGS="-D warnings" cargo build
+            RUSTFLAGS="-D warnings" cargo build --all
+      - run:
+          name: Build ledger
+          command: |
+            RUSTFLAGS="-D warnings" ./tools/build-ledger-wasm
+
+      - run:
+          name: Parity Ethereum Node
+          background: true
+          command:
+            ./parity --config dev-insecure
+
+      - run:
+          name: Deploy contract
+          command: |
+            cargo run --bin osc-deploy
+            if [[ $(cargo run --bin osc-ping) != "pong" ]]; then
+              echo "Expected ledger to reponsd with pong"
+              exit 1
+            fi
 
       - save_cache:
           # "epoch" is here to ensure that we upload a new cache on each build
