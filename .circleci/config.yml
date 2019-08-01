@@ -5,12 +5,28 @@ jobs:
 
     steps:
       - checkout
+      - run:
+          name: "Setup custom environment variables"
+          command: |
+            echo 'export RUSTUP_HOME=$HOME/.rustup' >> $BASH_ENV
+            echo 'export CARGO_HOME=$HOME/.cargo' >> $BASH_ENV
+            echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $BASH_ENV
       - restore_cache:
-          key: build-cache-v1
+          keys:
+          - rustup-v3-{{ checksum "rust-toolchain" }}
       - run:
           name: Install components
           command: |
             rustup component add rustfmt
+            rustup target add wasm32-unknown-unknown
+      - save_cache:
+          key: rustup-v3-{{ checksum "rust-toolchain" }}
+          paths:
+            - "~/.rustup"
+
+      - restore_cache:
+          keys:
+          - cargo-target-v1-{{ checksum "Cargo.lock" }}
       - run:
           name: Check formatting
           command: |
@@ -19,8 +35,10 @@ jobs:
           name: Build
           command: |
             RUSTFLAGS="-D warnings" cargo build
+
       - save_cache:
-          key: build-cache-v1
+          # "epoch" is here to ensure that we upload a new cache on each build
+          key: cargo-target-v1-{{ checksum "Cargo.lock" }}-{{ epoch }}
           paths:
             - "~/.cargo"
             - "./target"
