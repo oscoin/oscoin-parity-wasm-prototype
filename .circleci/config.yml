@@ -1,0 +1,26 @@
+jobs:
+  build:
+    docker:
+      - image: circleci/rust:1.36-buster
+
+    steps:
+      - checkout
+      - restore_cache:
+          key: build-cache-v1
+      - run:
+          name: Install components
+          command: |
+            rustup component add rustfmt
+      - run:
+          name: Check formatting
+          command: |
+            cargo fmt -- --check
+      - run:
+          name: Build
+          command: |
+            RUSTFLAGS="-D warnings" cargo build
+      - save_cache:
+          key: build-cache-v1
+          paths:
+            - "~/.cargo"
+            - "./target"
