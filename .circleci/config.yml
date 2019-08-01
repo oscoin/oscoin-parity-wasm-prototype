@@ -18,7 +18,7 @@ jobs:
       - run:
           name: Build
           command: |
-            cargo build
+            RUSTFLAGS="-D warnings" cargo build
       - save_cache:
           key: build-cache-v1
           paths:
