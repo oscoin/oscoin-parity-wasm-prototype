@@ -719,7 +719,17 @@ dependencies = [
  "clap 2.33.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "env_logger 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "hex 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "oscoin_client 0.1.0",
  "oscoin_ledger 0.1.0",
+ "web3 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "oscoin_client"
+version = "0.1.0"
+dependencies = [
+ "ethabi 8.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rustc-hex 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "web3 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
