@@ -1,0 +1,11 @@
+[package]
+name = "oscoin_client"
+description = "Client library for talking to the oscoin ledger running on a full node."
+version = "0.1.0"
+authors = ["Thomas Scholtes <thomas@monadic.xyz>"]
+edition = "2018"
+
+[dependencies]
+web3 = "0.8.0"
+ethabi = "8.0.0"
+rustc-hex = "2.0.1"

@@ -13,5 +13,6 @@ env_logger = "0.6.2"
 hex = "0.3.1"
 clap = "2.31"
 oscoin_ledger = { path = "./ledger", features = ["std"] }
+oscoin_client = { path = "./client" }
 
 [workspace]
