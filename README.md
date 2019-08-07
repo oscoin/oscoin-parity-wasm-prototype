@@ -29,7 +29,7 @@ Requirements
 Deploying the Ledger
 --------------------
 
-1. Run a development node with `./tools/run-node`.
+1. Run a development node with `./dev-node/run`.
 1. Build the ledger with `./tools/build-ledger-wasm`
 1. Deploy the ledger to the node with `cargo run --bin osc-deploy`. This will
    write the contract address to `.oscoin_ledger_address`.
