@@ -9,7 +9,7 @@ set -euo pipefail
 
 # Rust flags to make the Wasm output small.
 rust_flags="${RUSTFLAGS:-""}"
-rust_flags=" -C panic=abort"
+rust_flags+=" -C panic=abort"
 rust_flags+=" -C lto=yes"
 rust_flags+=" -C opt-level=z"
 # Restricting the stack-size limits the initial memory size and memory
