@@ -2,9 +2,9 @@
 //!
 //! All of the parameters are provided as constants.
 //!
-//! ```
+//! ```no_run
 //! let contract = oscoin_deploy::deploy().unwrap();
-//! oscoin_deploy::write_contract_address(contract.address());
+//! oscoin_deploy::write_contract_address(&contract.address());
 //! ```
 use std::fs;
 use web3::contract::{Contract, Options};
@@ -13,7 +13,7 @@ use web3::types::Address;
 use web3::Web3;
 
 /// Maximum gas used to deploy the contract
-pub const DEPLOY_GAS: u32 = 12_000_000;
+pub const DEPLOY_GAS: u32 = 18_000_000;
 
 /// Path to the contract Wasm code. Is `./target/oscoin_ledger.wasm`.
 pub const CONTRACT_CODE_PATH: &str = "./target/oscoin_ledger.wasm";
@@ -40,10 +40,6 @@ pub const CONTRACT_ADDRESS_FILE: &str = "./.oscoin_ledger_address";
 ///
 /// **Note:** This contract blocks on IO.
 pub fn deploy() -> Result<Contract<web3::transports::Http>, String> {
-    let dev_account_addr = DEV_ACCOUNT_ADDR
-        .parse()
-        .expect("address is hardcoded and valid");
-
     let web3 = prepare_web3();
 
     let contract_code = fs::read(CONTRACT_CODE_PATH)
@@ -57,12 +53,12 @@ pub fn deploy() -> Result<Contract<web3::transports::Http>, String> {
         }));
 
     web3.personal()
-        .unlock_account(dev_account_addr, DEV_ACCOUNT_PASSWORD, None)
+        .unlock_account(dev_account_address(), DEV_ACCOUNT_PASSWORD, None)
         .wait()
         .map_err(|e| format!("Failed to unlock dev account: {}", e))?;
 
     let pending_contract = builder
-        .execute(hex::encode(contract_code), (), dev_account_addr)
+        .execute(hex::encode(contract_code), (), dev_account_address())
         .expect("Correct parameters are passed to the constructor.");
 
     let contract = pending_contract
@@ -70,6 +66,13 @@ pub fn deploy() -> Result<Contract<web3::transports::Http>, String> {
         .map_err(|e| format!("Failed to create contract: {}", e))?;
 
     Ok(contract)
+}
+
+/// Returns the address of the dev account provided by the `oscoin` chain spec.
+pub fn dev_account_address() -> Address {
+    DEV_ACCOUNT_ADDR
+        .parse()
+        .expect("address is hardcoded and valid")
 }
 
 /// Writes contract address to [CONTRACT_ADDRESS_FILE].

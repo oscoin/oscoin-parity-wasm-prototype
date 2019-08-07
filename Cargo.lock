@@ -722,6 +722,7 @@ dependencies = [
  "hex 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "oscoin_client 0.1.0",
  "oscoin_deploy 0.1.0",
+ "web3 0.8.0 (git+https://github.com/tomusdrw/rust-web3.git?rev=b2aa7336bc9bf192f7959e79525a6d2667ff4c85)",
 ]
 
 [[package]]
@@ -729,6 +730,7 @@ name = "oscoin_client"
 version = "0.1.0"
 dependencies = [
  "ethabi 8.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "futures 0.1.28 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-hex 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "web3 0.8.0 (git+https://github.com/tomusdrw/rust-web3.git?rev=b2aa7336bc9bf192f7959e79525a6d2667ff4c85)",
 ]
@@ -747,6 +749,7 @@ dependencies = [
 name = "oscoin_ledger"
 version = "0.1.0"
 dependencies = [
+ "lazy_static 1.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pwasm-abi 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "pwasm-abi-derive 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "pwasm-ethereum 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
