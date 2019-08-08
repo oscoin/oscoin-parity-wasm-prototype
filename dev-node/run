@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+cd $(dirname $BASH_SOURCE[0])
+
+parity \
+  --config ./config.toml \
+  account import ./dev-key.json
+parity --config ./config.toml

@@ -36,6 +36,7 @@ jobs:
             echo "1b50cabc8ce54983d1b10be4c4f5887ff4ecfe63177e6c49cde819a563fb9d96  parity" > parity.sum
             sha256sum parity.sum
             chmod +x parity
+            sudo mv parity /usr/local/bin
 
       - run:
           name: Check formatting
@@ -54,7 +55,7 @@ jobs:
           name: Parity Ethereum Node
           background: true
           command:
-            ./parity --config dev-insecure
+            ./dev-node/run
 
       - run:
           name: Deploy contract
