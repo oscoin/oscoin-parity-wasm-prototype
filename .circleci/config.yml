@@ -41,7 +41,7 @@ jobs:
       - run:
           name: Check formatting
           command: |
-            cargo fmt -- --check
+            cargo fmt --all -- --check
       - run:
           name: Build
           command: |
