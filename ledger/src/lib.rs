@@ -1,4 +1,4 @@
-#![cfg_attr(not(test), no_std)]
+#![cfg_attr(all(not(test), not(feature = "std")), no_std)]
 #![allow(non_snake_case)]
 #![feature(proc_macro_hygiene)]
 
@@ -6,13 +6,18 @@ use pwasm_abi_derive::eth_abi;
 // Implements the dispatch and dispatch_ctor methods
 use pwasm_abi::eth::EndpointInterface;
 
-use crate::pwasm::{String, H256, U256};
+use crate::pwasm::{Address, String, H256, U256};
 
-mod pwasm;
+pub mod pwasm;
+pub mod storage;
+
+use storage::Storage;
 
 #[no_mangle]
 pub fn call() {
-    let mut endpoint = LedgerEndpoint::new(Ledger_ { env: pwasm::Pwasm });
+    let mut endpoint = LedgerEndpoint::new(Ledger_ {
+        env: Storage { env: pwasm::Pwasm },
+    });
     pwasm_ethereum::ret(&endpoint.dispatch(&pwasm_ethereum::input()));
 }
 
@@ -28,10 +33,16 @@ pub trait Ledger {
 
     #[constant]
     fn counter_value(&mut self) -> U256;
+
+    fn register_project(&mut self, account: Address, url: String);
+
+    #[constant]
+    fn get_project_url(&mut self, account: Address) -> String;
 }
 
+/// Implements [Ledger] backed by [Storage].
 pub struct Ledger_<E: pwasm::Env> {
-    env: E,
+    pub env: Storage<E>,
 }
 
 lazy_static::lazy_static! {
@@ -47,14 +58,23 @@ impl<E: pwasm::Env> Ledger for Ledger_<E> {
     }
 
     fn counter_inc(&mut self) {
-        let data = self.env.read(&COUNTER_ADDRESS);
-        let counter = U256::from(data);
-        self.env.write(&COUNTER_ADDRESS, &(counter + 1).into());
+        let data = self.env.read(COUNTER_ADDRESS.as_ref());
+        let counter = U256::from(data.as_slice());
+        self.env
+            .write(COUNTER_ADDRESS.as_ref(), H256::from(counter + 1).as_ref());
     }
 
     fn counter_value(&mut self) -> U256 {
-        let data = self.env.read(&COUNTER_ADDRESS);
-        U256::from(data)
+        let data = self.env.read(COUNTER_ADDRESS.as_ref());
+        U256::from(data.as_slice())
+    }
+
+    fn register_project(&mut self, account: Address, url: String) {
+        self.env.write(account.as_ref(), url.as_ref())
+    }
+
+    fn get_project_url(&mut self, account: Address) -> String {
+        String::from_utf8(self.env.read(account.as_ref())).unwrap()
     }
 }
 
@@ -79,9 +99,21 @@ mod test {
         assert_eq!(counter, U256::from(0));
     }
 
+    #[test]
+    fn register_project() {
+        let mut ledger = new_ledger();
+        let account = Address::zero();
+        let url = "https://example.com";
+        ledger.register_project(account, url.into());
+        let expected_url = ledger.get_project_url(account);
+        assert_eq!(url, expected_url);
+    }
+
     fn new_ledger() -> Ledger_<pwasm::TestEnv> {
         Ledger_ {
-            env: pwasm::TestEnv::new(),
+            env: Storage {
+                env: pwasm::TestEnv::new(),
+            },
         }
     }
 }

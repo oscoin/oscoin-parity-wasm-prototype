@@ -21,4 +21,5 @@ git = "https://github.com/paritytech/pwasm-test"
 crate-type = ["cdylib"]
 
 [features]
+default = ["std"]
 std = ["pwasm-std/std", "pwasm-ethereum/std"]
