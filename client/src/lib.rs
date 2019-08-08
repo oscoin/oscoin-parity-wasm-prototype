@@ -116,15 +116,15 @@ impl Client {
         Ok(Self::new(sender, contract_address))
     }
 
-    pub fn ping<'a>(&'a self) -> QueryResult<'a, String> {
+    pub fn ping(&self) -> QueryResult<String> {
         self.query("ping", ())
     }
 
-    pub fn counter_value<'a>(&'a self) -> QueryResult<'a, U256> {
+    pub fn counter_value(&self) -> QueryResult<U256> {
         self.query("counter_value", ())
     }
 
-    pub fn counter_inc<'a>(&'a self) -> SubmitResult<'a> {
+    pub fn counter_inc(&self) -> SubmitResult {
         self.submit("counter_inc", ())
     }
 }
