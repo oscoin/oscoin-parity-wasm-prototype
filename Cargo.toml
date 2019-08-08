@@ -8,13 +8,18 @@ authors = [
 edition = "2018"
 
 [dependencies]
+oscoin_client = { path = "./client" }
+
+clap = "2.31"
+env_logger = "0.6.2"
+hex = "0.3.1"
+web3 = "0.8.0"
+
+
+[patch.crates-io]
 # We require the patch https://github.com/tomusdrw/rust-web3/pull/242.
 # Once a new version of web3 is released we can update it.
 web3 = { git = "https://github.com/tomusdrw/rust-web3.git", rev = "b2aa7336bc9bf192f7959e79525a6d2667ff4c85" }
-env_logger = "0.6.2"
-hex = "0.3.1"
-clap = "2.31"
-oscoin_client = { path = "./client" }
 
 [workspace]
 members = ["ledger"]
