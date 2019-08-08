@@ -9,11 +9,12 @@ edition = "2018"
 
 [dependencies]
 oscoin_client = { path = "./client" }
+oscoin_deploy = { path = "./deploy" }
 
 clap = "2.31"
 env_logger = "0.6.2"
+futures = "0.1.28"
 hex = "0.3.1"
-web3 = "0.8.0"
 
 
 [patch.crates-io]
@@ -22,4 +23,4 @@ web3 = "0.8.0"
 web3 = { git = "https://github.com/tomusdrw/rust-web3.git", rev = "b2aa7336bc9bf192f7959e79525a6d2667ff4c85" }
 
 [workspace]
-members = ["ledger"]
+members = ["deploy", "ledger"]
