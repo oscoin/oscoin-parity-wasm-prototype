@@ -740,7 +740,6 @@ dependencies = [
  "env_logger 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "hex 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "oscoin_client 0.1.0",
- "oscoin_ledger 0.1.0",
  "web3 0.8.0 (git+https://github.com/tomusdrw/rust-web3.git?rev=b2aa7336bc9bf192f7959e79525a6d2667ff4c85)",
 ]
 
