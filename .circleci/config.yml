@@ -60,7 +60,7 @@ jobs:
       - run:
           name: Deploy contract
           command: |
-            cargo run --bin osc-deploy
+            cargo run --package oscoin_deploy
             if [[ $(cargo run --bin osc-ping) != "pong" ]]; then
               echo "Expected ledger to reponsd with pong"
               exit 1

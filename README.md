@@ -31,7 +31,7 @@ Deploying the Ledger
 
 1. Run a development node with `./dev-node/run`.
 1. Build the ledger with `./tools/build-ledger-wasm`
-1. Deploy the ledger to the node with `cargo run --bin osc-deploy`. This will
+1. Deploy the ledger to the node with `cargo run --package oscoin_deploy`. This will
    write the contract address to `.oscoin_ledger_address`.
 1. Test the ledger with `cargo run --bin osc-ping`.
 
@@ -42,7 +42,7 @@ Commands and Tools
 
 Calls the ledger’s `ping` method and prints the result.
 
-#### `osc-deploy`
+#### `osc-deploy` from `oscoin_deploy` crate
 
 Deploys the ledger contract and sets the ledger contract address.
 

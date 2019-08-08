@@ -1,7 +1,7 @@
 ///! Calls the oscoin ledger contract’s ping method and returns the output.
 use env_logger;
 
-use web3::futures::Future;
+use futures::Future;
 
 use clap::crate_version;
 use clap::App;
@@ -18,7 +18,7 @@ fn main() {
             format!(
                 "\nCalls the ledger’s \"ping\" method and outputs the result. Reads the ledger \
                  contract address from \"{}\"",
-                oscoin::deploy::CONTRACT_ADDRESS_FILE
+                oscoin_deploy::CONTRACT_ADDRESS_FILE
             )
             .as_ref(),
         )

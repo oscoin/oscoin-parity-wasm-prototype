@@ -718,9 +718,10 @@ version = "0.1.0"
 dependencies = [
  "clap 2.33.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "env_logger 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "futures 0.1.28 (registry+https://github.com/rust-lang/crates.io-index)",
  "hex 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "oscoin_client 0.1.0",
- "web3 0.8.0 (git+https://github.com/tomusdrw/rust-web3.git?rev=b2aa7336bc9bf192f7959e79525a6d2667ff4c85)",
+ "oscoin_deploy 0.1.0",
 ]
 
 [[package]]
@@ -729,6 +730,16 @@ version = "0.1.0"
 dependencies = [
  "ethabi 8.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-hex 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "web3 0.8.0 (git+https://github.com/tomusdrw/rust-web3.git?rev=b2aa7336bc9bf192f7959e79525a6d2667ff4c85)",
+]
+
+[[package]]
+name = "oscoin_deploy"
+version = "0.1.0"
+dependencies = [
+ "clap 2.33.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "env_logger 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "hex 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "web3 0.8.0 (git+https://github.com/tomusdrw/rust-web3.git?rev=b2aa7336bc9bf192f7959e79525a6d2667ff4c85)",
 ]
 
