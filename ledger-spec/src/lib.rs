@@ -33,10 +33,10 @@ pub struct URL;
 /// It is still unclear whether the project's keyset should be present in this
 /// data structure, or if it will be in a different layer of the protocol.
 pub struct Project {
-    addr : Address,
+    addr: Address,
     /// A project's latest commit hash.
-    hash : Hash,
-    url  : URL
+    hash: Hash,
+    url: URL,
 }
 
 /// Description of errors that may occur when registering a project in the
@@ -70,7 +70,7 @@ pub enum KeysetError {
     /// Version 1.0 of the whitepaper does not mention what happens when
     /// `addkey`/`removekey` are called with projects that have not yet been
     /// added to the ledger, so here that is tentatively treated as an error.
-    AddressNotInUseError()
+    AddressNotInUseError(),
 }
 
 /// Errors that may happen when unregistering a project.
@@ -94,12 +94,12 @@ pub enum CheckpointError {
 
     /// As the whitepaper says, a checkpoint is invalid if the dependency
     /// update list containts duplicate dependencies.
-    DuplicateDependenciesError()
+    DuplicateDependenciesError(),
 }
 
 /// Datatype representing a hash-linked-list. Used in the whitepaper to
 /// organize contributions when checkpointing.
-/// 
+///
 /// The type it abstracts over - in the context of the whitepaper's Ledger
 /// section, contributions, here abbreviated as `C` - should be a tuple,
 /// struct or equivalent with at least two fields e.g. `prev` and `commit`
@@ -113,8 +113,8 @@ pub enum CheckpointError {
 ///
 /// In practice, it may not necessarily be a list, but conceptually the name
 /// is explanatory.
-pub struct HashLinkedList <T> {
-    contributions : PhantomData<T>
+pub struct HashLinkedList<T> {
+    contributions: PhantomData<T>,
 }
 
 /// Representation of a contribution's author.
@@ -128,59 +128,67 @@ pub struct Author;
 /// * what is the type of C_author? Is it the GPG public key used to sign the
 ///   commit? Is it a string with their name?
 pub struct Contribution {
-    prev : Hash,
-    commit : Hash,
-    author : Author,
-    signoff : PublicKey
+    prev: Hash,
+    commit: Hash,
+    author: Author,
+    signoff: PublicKey,
 }
 
-/// Datatype representing a dependency update, another segment of data require
+/// Datatype representing a dependency update, another segment of data required
 /// in order to checkpoint a project in the Oscoin ledger.
 pub enum DependencyUpdate {
     /// Constructor to add a dependency.
     Depend {
         /// Address of the project being added to the dependency list.
-        addr : Address,
+        addr: Address,
         /// Zero-based index of the current checkpoint, in which the
         /// dependency is being added.
-        cp_index : u64
+        cp_index: u64,
     },
     /// Constructor to remove a dependency.
     Undepend {
         /// Address of the project being removed from the dependency list.
-        addr : Address,
+        addr: Address,
         /// Zero-based index of the current checkpoint, in which the
         /// dependency is being removed.
-        cp_index : u64
-    }
+        cp_index: u64,
+    },
 }
 
 pub trait LedgerTransactions {
-
     /// Registering a project in the Oscoin Ledger.
-    fn register_project ( project_address : Address
-                        , project_source_url : URL)
-        -> Result<(), RegisterProjectError> { unimplemented!() }
+    fn register_project(
+        project_address: Address,
+        project_source_url: URL,
+    ) -> Result<(), RegisterProjectError> {
+        unimplemented!()
+    }
 
     /// Given a certain project, `addkey` adds a key to its set of keys (c.f.
     /// section 4.4.1 of the whitepaper).
-    fn addkey (project_address : Address, maintainer_key : Address)
-        -> Result<(), KeysetError> { unimplemented!() }
+    fn addkey(project_address: Address, maintainer_key: Address) -> Result<(), KeysetError> {
+        unimplemented!()
+    }
 
     /// Given a certain project, `removekey` removes a key from its set of
     /// keys (c.f. section 4.4.1 of the whitepaper).
-    fn removekey (project_address : Address, maintainer_key : Address)
-        -> Result<(), KeysetError> { unimplemented!() }
+    fn removekey(project_address: Address, maintainer_key: Address) -> Result<(), KeysetError> {
+        unimplemented!()
+    }
 
     /// Unregistering a project in the Oscoin Ledger.
-    fn unregister_project ( project_address : Address)
-        -> Result<(), UnregisterProjectError> { unimplemented!() }
+    fn unregister_project(project_address: Address) -> Result<(), UnregisterProjectError> {
+        unimplemented!()
+    }
 
     /// Checkpointing a project in Oscoin's ledger.
-    fn checkpoint ( project_address : Address
-                  , new_project_hash : Hash
-                  , project_url : URL
-                  , contribution_list : HashLinkedList<Contribution>
-                  , dependency_updates : Vec<DependencyUpdate>
-                  ) -> Result<(), CheckpointError> { unimplemented!() }
+    fn checkpoint(
+        project_address: Address,
+        new_project_hash: Hash,
+        project_url: URL,
+        contribution_list: HashLinkedList<Contribution>,
+        dependency_updates: Vec<DependencyUpdate>,
+    ) -> Result<(), CheckpointError> {
+        unimplemented!()
+    }
 }
