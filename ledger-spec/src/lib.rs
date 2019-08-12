@@ -39,6 +39,24 @@ pub struct Project {
     url: URL,
 }
 
+/// Numerical type representing Oscoin amounts. It is still to be decided, but
+/// it may be `u64`, `u128` or even a rational type so fractional amounts can
+/// be represented. Subject to discussion.
+pub struct Oscoin;
+
+/// Description of errors that a transfer of Oscoin may raise.
+pub enum TransferError {
+    /// This type of error is only here tentatively since the validation of a
+    /// transfer's data may not necessarily occur in the Ledger layer, meaning
+    /// it may not have to deal with this
+    InsufficientBalanceError(),
+
+    /// As mentioned in the whitepaper, the contracts associated with the
+    /// sending and receiving addresses must authorize the transfer for it
+    /// to be valid, otherwise it will result in this error.
+    ContractDeniedError(),
+}
+
 /// Description of errors that may occur when registering a project in the
 /// Oscoin ledger (`register` transaction). Not exhaustive, but should cover
 /// most common cases.
@@ -156,6 +174,15 @@ pub enum DependencyUpdate {
 }
 
 pub trait LedgerTransactions {
+    /// Transfer Oscoin from one account to another.
+    fn transfer_oscoin(
+        from_addr: Address,
+        to_addr: Address,
+        amount: Oscoin,
+    ) -> Result<(), TransferError> {
+        unimplemented!()
+    }
+
     /// Registering a project in the Oscoin Ledger.
     fn register_project(
         project_address: Address,
