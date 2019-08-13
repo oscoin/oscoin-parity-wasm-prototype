@@ -67,6 +67,12 @@ pub struct Contribution {
     signoff: PublicKey,
 }
 
+/// Representation of the indexes of a project's checkpoints.
+///
+/// They are 0-indexed, so they may be internally represented by a type like
+/// `u64` or similar.
+pub struct CheckpointIndex;
+
 /// Datatype representing a dependency update, another segment of data required
 /// in order to checkpoint a project in the Oscoin ledger.
 pub enum DependencyUpdate {
@@ -76,7 +82,7 @@ pub enum DependencyUpdate {
         addr: Address,
         /// Zero-based index of the current checkpoint, in which the
         /// dependency is being added.
-        cp_index: u64,
+        cp_index: CheckpointIndex,
     },
     /// Constructor to remove a dependency.
     Undepend {
@@ -84,6 +90,6 @@ pub enum DependencyUpdate {
         addr: Address,
         /// Zero-based index of the current checkpoint, in which the
         /// dependency is being removed.
-        cp_index: u64,
+        cp_index: CheckpointIndex,
     },
 }

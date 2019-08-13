@@ -3,12 +3,12 @@ pub enum TransferError {
     /// This type of error is only here tentatively since the validation of a
     /// transfer's data may not necessarily occur in the Ledger layer, meaning
     /// it may not have to deal with this
-    InsufficientBalanceError(),
+    InsufficientBalanceError,
 
     /// As mentioned in the whitepaper, the contracts associated with the
     /// sending and receiving addresses must authorize the transfer for it
     /// to be valid, otherwise it will result in this error.
-    ContractDeniedError(),
+    ContractDeniedError,
 }
 
 /// Description of errors that may occur when registering a project in the
@@ -17,7 +17,7 @@ pub enum TransferError {
 pub enum RegisterProjectError {
     /// The project address used to register it is already present in the
     /// ledger.
-    AddressInUseError(),
+    AddressInUseError,
 
     /// The canonical source URL used to register the project is invalid.
     ///
@@ -42,7 +42,7 @@ pub enum KeysetError {
     /// Version 1.0 of the whitepaper does not mention what happens when
     /// `addkey`/`removekey` are called with projects that have not yet been
     /// added to the ledger, so here that is tentatively treated as an error.
-    AddressNotInUseError(),
+    AddressNotInUseError,
 }
 
 /// Errors that may happen when unregistering a project.
@@ -58,13 +58,13 @@ pub enum UnregisterProjectError {}
 pub enum CheckpointError {
     /// A dependency update is invalid if it adds a dependency the project
     /// already uses.
-    UsedDependencyAddedError(),
+    UsedDependencyAddedError,
 
     /// A dependency update is invalid if it removes a dependency the project
     /// does not use.
-    UnusedDependencyRemovedError(),
+    UnusedDependencyRemovedError,
 
     /// As the whitepaper says, a checkpoint is invalid if the dependency
     /// update list containts duplicate dependencies.
-    DuplicateDependenciesError(),
+    DuplicateDependenciesError,
 }
