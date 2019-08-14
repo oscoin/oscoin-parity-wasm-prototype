@@ -23,4 +23,4 @@ hex = "0.3.1"
 web3 = { git = "https://github.com/tomusdrw/rust-web3.git", rev = "b2aa7336bc9bf192f7959e79525a6d2667ff4c85" }
 
 [workspace]
-members = ["deploy", "ledger"]
+members = ["deploy", "ledger", "ledger-spec"]
