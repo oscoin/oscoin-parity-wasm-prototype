@@ -11,6 +11,10 @@ This repository hosts a prototype of Oscoin's Ledger API using WASM and Parity E
 - [Requirements](#requirements)
 - [Deploying the Ledger](#deploying-the-ledger)
 - [Commands and Tools](#commands-and-tools)
+    + [`osc-ping`](#osc-ping)
+    + [`osc-deploy` from `oscoin_deploy` crate](#osc-deploy-from-oscoin_deploy-crate)
+    + [`./tools/build-ledger-wasm`](#toolsbuild-ledger-wasm)
+- [Testing](#testing)
 
 <!-- tocstop -->
 
@@ -49,3 +53,11 @@ Deploys the ledger contract and sets the ledger contract address.
 #### `./tools/build-ledger-wasm`
 
 Build the ledger contract Wasm code and output it to `./target/oscoin_ledger.wasm`.
+
+Testing
+-------
+
+To run the tests
+1. Build the ledger with `./tools/build-ledger-wasm`
+2. Run the dev node with `./dev-node/run`
+3. Run `cargo test --all`

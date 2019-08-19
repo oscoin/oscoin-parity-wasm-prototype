@@ -15,6 +15,7 @@ clap = "2.31"
 env_logger = "0.6.2"
 futures = "0.1.28"
 hex = "0.3.1"
+web3 = "0.8.0"
 
 
 [patch.crates-io]

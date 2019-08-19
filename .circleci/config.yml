@@ -58,13 +58,9 @@ jobs:
             ./dev-node/run
 
       - run:
-          name: Deploy contract
+          name: Test
           command: |
-            cargo run --package oscoin_deploy
-            if [[ $(cargo run --bin osc-ping) != "pong" ]]; then
-              echo "Expected ledger to reponsd with pong"
-              exit 1
-            fi
+            cargo test --all --color=always
 
       - save_cache:
           # "epoch" is here to ensure that we upload a new cache on each build
