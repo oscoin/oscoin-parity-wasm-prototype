@@ -139,7 +139,7 @@ impl Client {
     ) -> QueryResult<'a, R> {
         let sender = self.sender;
         let future = self
-            .unlock_account()
+            .unlock_account_()
             .map_err(web3::contract::Error::from)
             .and_then(move |()| {
                 self.contract
@@ -156,7 +156,7 @@ impl Client {
     /// Note that an error is only visible as a zero status in the [TransactionReceipt].
     fn submit<'a>(&'a self, method: &'a str, params: impl Tokenize + 'a) -> SubmitResult<'a> {
         let sender = self.sender;
-        let future = self.unlock_account().and_then(move |()| {
+        let future = self.unlock_account_().and_then(move |()| {
             self.contract
                 .call_with_confirmations(method, params, sender, Options::default(), 0)
         });
@@ -166,10 +166,12 @@ impl Client {
     }
 
     /// Unlock the node account used by the client.
+    /// Note the `_` at the end to differentiate from the same function
+    /// imported from `web3`.
     ///
     /// TODO: Panics when the unlock RPC method responds with `false`. It should result in an
     /// error.
-    fn unlock_account(&self) -> impl Future<Item = (), Error = web3::error::Error> {
+    fn unlock_account_(&self) -> impl Future<Item = (), Error = web3::error::Error> {
         let sender = self.sender;
         self.web3
             .personal()
