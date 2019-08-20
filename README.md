@@ -25,7 +25,7 @@ Requirements
 ------------
 
 * [`rustup`](https://github.com/rust-lang/rustup.rs/)
-* [Latest version][peth-release] of the Parity Ethereum node on the OATH
+* [Latest version][peth-release] of the Parity Ethereum node on the PATH
 * `cargo install pwasm-utils-cli --version 0.6.0 --bin wasm-build`
 
 [peth-release]: https://github.com/paritytech/parity-ethereum/releases/latest
