@@ -1,8 +1,15 @@
 use std::marker::PhantomData;
 
-/// Type for Ledger addresses. Its specific data structure is not
-/// important here.
+/// Type for human-readable ledger addresses. Its specific data structure is
+/// not important here.
 pub struct Address;
+
+/// Type for account identifier. Uniquely corresponds to an account in the
+/// ledger.
+///
+/// At present it is assumed to be the same as `Address`, but will eventually
+/// diverge.
+pub type AccountId = Address;
 
 /// Type for Ledger public keys. Its specific data structure is not
 /// important here, just as it is with `Address`es.
@@ -27,7 +34,7 @@ pub struct Author;
 /// It is still unclear whether the project's keyset should be present in this
 /// data structure, or if it will be in a different layer of the protocol.
 pub struct Project {
-    addr: Address,
+    addr: AccountId,
     /// A project's latest commit hash.
     hash: Hash,
     url: URL,
@@ -60,6 +67,9 @@ pub struct HashLinkedList<T> {
 /// * what is C_sig for? It is defined but not used anywhere
 /// * what is the type of C_author? Is it the GPG public key used to sign the
 ///   commit? Is it a string with their name?
+/// Answer:
+/// TODO: author is PK of author, signoff is reviewer/approver (may be optional)
+/// TODO: both PKs associated with accs on Oscoin.
 pub struct Contribution {
     prev: Hash,
     commit: Hash,
@@ -79,7 +89,7 @@ pub enum DependencyUpdate {
     /// Constructor to add a dependency.
     Depend {
         /// Address of the project being added to the dependency list.
-        addr: Address,
+        addr: AccountId,
         /// Zero-based index of the current checkpoint, in which the
         /// dependency is being added.
         cp_index: CheckpointIndex,
@@ -92,4 +102,26 @@ pub enum DependencyUpdate {
         /// dependency is being removed.
         cp_index: CheckpointIndex,
     },
+}
+
+/// The project contract's handler meant to be updated.
+///
+/// This will most likely be an specific, explicit section of the WASM
+/// smart contract that is attached to the project's account.
+pub struct Handler;
+
+/// The project handler code meant to replace the previous handler.
+///
+/// It is still to be decided what specific form this will take e.g. a WASM
+/// binary, Rust to be compiled into WASM by another layer, etc.
+pub struct Code;
+
+/// A representation of the collection of votes the contract update's author
+/// has gathered in favor of the update.
+///
+/// In concrete terms, these votes can be public keys, account identifiers,
+/// or a signature of the handler update by the voter's secret key. This is yet
+/// to be decided.
+pub struct VoteSet<T> {
+    votes: PhantomData<T>,
 }
