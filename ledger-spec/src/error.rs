@@ -28,10 +28,11 @@ pub enum RegisterProjectError {
     /// 1. it is a proper URL as defined in [RFC 3986](https:///tools.ietf.org/html/rfc3986#section-1.1.3), and
     /// 2. it hosts the repository's page in a distributed version control
     ///    system's website e.g. GitLab, BitBucket, SourceForge, GitHub, and
-    /// 3. it can be accessed without restrictions [*]
-    /// [*] This part can be harder to define - if the URL returns permanently
-    /// returns `404`s *after* it has been inducted into the ledger, but not
-    /// before, is it still valid?
+    /// 3. it can be accessed without restrictions (^)
+    ///
+    /// (^) This part can be harder to define - if the URL permanently returns
+    /// `404`s *after* it has been inducted into the ledger, but not before,
+    /// is it still valid?
     InvalidURLError,
 }
 
