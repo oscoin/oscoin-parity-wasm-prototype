@@ -1,19 +1,11 @@
-// These two moducratee-wide attributes are used to disable "unused variable"
-// and "field is never used" warnings when compiling this file.
-// Notice the bang (`!`) before the attributes - this means they are
-// crate-wide because this is a library, and they are placed in its root
-// (a library's crate root is always `src/lib.rs`).
-#![allow(dead_code)]
-#![allow(unused_variables)]
-
-/// This is a specification document meant to approximate the Ledger described in
-/// Oscoin whitepaper into concrete Rust code.
-/// However, it is not meant to be an exact implementation.
-///
-/// It is to serve as a form of documentation that will change over
-/// time with the project.
-mod error;
-mod types;
+//! This is a specification document meant to approximate the Ledger described in
+//! Oscoin whitepaper into concrete Rust code.
+//! However, it is not meant to be an exact implementation.
+//!
+//! It is to serve as a form of documentation that will change over
+//! time with the project.
+pub mod error;
+pub mod types;
 
 /// A trait exposing the Oscoin ledger transactions described in the
 /// whitepaper.

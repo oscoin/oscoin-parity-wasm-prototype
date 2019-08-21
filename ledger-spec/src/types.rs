@@ -27,10 +27,10 @@ pub struct Author;
 /// It is still unclear whether the project's keyset should be present in this
 /// data structure, or if it will be in a different layer of the protocol.
 pub struct Project {
-    addr: Address,
+    pub addr: Address,
     /// A project's latest commit hash.
-    hash: Hash,
-    url: URL,
+    pub hash: Hash,
+    pub url: URL,
 }
 
 /// Datatype representing a hash-linked-list. Used in the whitepaper to
@@ -61,10 +61,10 @@ pub struct HashLinkedList<T> {
 /// * what is the type of C_author? Is it the GPG public key used to sign the
 ///   commit? Is it a string with their name?
 pub struct Contribution {
-    prev: Hash,
-    commit: Hash,
-    author: Author,
-    signoff: PublicKey,
+    pub prev: Hash,
+    pub commit: Hash,
+    pub author: Author,
+    pub signoff: PublicKey,
 }
 
 /// Representation of the indexes of a project's checkpoints.
