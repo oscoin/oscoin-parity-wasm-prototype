@@ -122,6 +122,4 @@ pub struct Code;
 /// In concrete terms, these votes can be public keys, account identifiers,
 /// or a signature of the handler update by the voter's secret key. This is yet
 /// to be decided.
-pub struct VoteSet<T> {
-    votes: PhantomData<T>,
-}
+pub struct VoteSet;

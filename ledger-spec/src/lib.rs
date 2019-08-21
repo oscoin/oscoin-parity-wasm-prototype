@@ -19,8 +19,8 @@ pub trait LedgerTransactions {
     /// This transaction's presence in the ledger layer is still subject to
     /// discussion.
     fn transfer_oscoin(
-        from_addr: types::AccountId,
-        to_addr: types::AccountId,
+        from_acc: types::AccountId,
+        to_acc: types::AccountId,
         amount: types::Oscoin,
     ) -> Result<(), error::TransferError>;
 
@@ -30,21 +30,21 @@ pub trait LedgerTransactions {
     /// discussion as there is still an unclear boundary between the account
     /// layer and the ledger. This matter can be revisited.
     fn register_project(
-        project_address: types::AccountId,
+        project_account: types::AccountId,
         project_source_url: types::URL,
     ) -> Result<(), error::RegisterProjectError>;
 
     /// Given a certain project, `addkey` adds a key to its set of keys (c.f.
     /// section 4.4.1 of the whitepaper).
     fn addkey(
-        project_address: types::AccountId,
+        project_account: types::AccountId,
         maintainer_key: types::AccountId,
     ) -> Result<(), error::KeysetError>;
 
     /// Given a certain project, `removekey` removes a key from its set of
     /// keys (c.f. section 4.4.1 of the whitepaper).
     fn removekey(
-        project_address: types::AccountId,
+        project_account: types::AccountId,
         maintainer_key: types::AccountId,
     ) -> Result<(), error::KeysetError>;
 
@@ -53,12 +53,12 @@ pub trait LedgerTransactions {
     /// As is the case above, this transaction may also be handled outside the
     /// ledger.
     fn unregister_project(
-        project_address: types::AccountId,
+        project_account: types::AccountId,
     ) -> Result<(), error::UnregisterProjectError>;
 
     /// Checkpointing a project in Oscoin's ledger.
     fn checkpoint(
-        project_address: types::AccountId,
+        project_account: types::AccountId,
         new_project_hash: types::Hash,
         project_url: types::URL,
         contribution_list: types::HashLinkedList<types::Contribution>,
@@ -70,9 +70,9 @@ pub trait LedgerTransactions {
     /// Can be used to e.g. modify rules for a project's fund management and
     /// distribution.
     fn update_contract(
-        project_address: types::AccountId,
+        project_account: types::AccountId,
         handler: types::Handler,
         code: types::Code,
-        votes: types::VoteSet<types::AccountId>,
+        votes: types::VoteSet,
     ) -> Result<(), error::ContractUpdateError>;
 }
