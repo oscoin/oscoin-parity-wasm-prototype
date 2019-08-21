@@ -82,9 +82,9 @@ pub trait LedgerTransactions {
         // checkpoint will be added.
         project_url: types::URL,
         // Hash-linked list of the checkpoint's contributions. To see more
-        // about this type, go to types.Contribution.
+        // about this type, go to types::Contribution.
         contribution_list: types::HashLinkedList<types::Contribution>,
-        // A vector of dependency updates. See types.DependencyUpdate
+        // A vector of dependency updates. See types::DependencyUpdate
         // for more information.
         //
         // It is to be treated as a list i.e. processed from left to right.
