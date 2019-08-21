@@ -6,12 +6,12 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
-/// This is a specification document meant to approximate the Ledger described in
-/// Oscoin whitepaper into concrete Rust code.
-/// However, it is not meant to be an exact implementation.
-///
-/// It is to serve as a form of documentation that will change over
-/// time with the project.
+//! This is a specification document meant to approximate the Ledger described in
+//! Oscoin whitepaper into concrete Rust code.
+//! However, it is not meant to be an exact implementation.
+//!
+//! It is to serve as a form of documentation that will change over
+//! time with the project.
 mod error;
 mod types;
 
