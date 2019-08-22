@@ -13,14 +13,15 @@ jobs:
             echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $BASH_ENV
       - restore_cache:
           keys:
-          - rustup-v3-{{ checksum "rust-toolchain" }}
+          - rustup-v4-{{ checksum "rust-toolchain" }}
       - run:
           name: Install components
           command: |
             rustup component add rustfmt
+            rustup component add clippy
             rustup target add wasm32-unknown-unknown
       - save_cache:
-          key: rustup-v3-{{ checksum "rust-toolchain" }}
+          key: rustup-v4-{{ checksum "rust-toolchain" }}
           paths:
             - "~/.rustup"
 
@@ -50,6 +51,10 @@ jobs:
           name: Build ledger
           command: |
             RUSTFLAGS="-D warnings" ./tools/build-ledger-wasm
+      - run:
+          name: Clippy
+          command: |
+            cargo clippy --all --all-targets -- -D warnings
 
       - run:
           name: Parity Ethereum Node
