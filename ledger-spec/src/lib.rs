@@ -91,3 +91,17 @@ pub trait LedgerTransactions {
         dependency_updates: Vec<types::DependencyUpdate>,
     ) -> Result<(), error::CheckpointError>;
 }
+
+/// Functions to access information from the ledger state.
+pub trait LedgerView {
+    /// Returns the project registered at the given address.
+    ///
+    /// Returns `None` if no project was registered or the project was unregistered.
+    fn get_project(project_address: types::AccountId) -> Option<types::Project>;
+
+    /// Returns the [Account] at the given address.
+    ///
+    /// An account exists for every address. If it has not receveived any money the empty account
+    /// with zero nonce and balance is returned.
+    fn get_account(address: types::AccountId) -> types::Account;
+}
