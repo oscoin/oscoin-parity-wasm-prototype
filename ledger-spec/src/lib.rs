@@ -90,24 +90,4 @@ pub trait LedgerTransactions {
         // It is to be treated as a list i.e. processed from left to right.
         dependency_updates: Vec<types::DependencyUpdate>,
     ) -> Result<(), error::CheckpointError>;
-
-    /// Transaction used to update a project's smart contract.
-    ///
-    /// Can be used to e.g. modify rules for a project's fund management and
-    /// distribution.
-    fn update_contract(
-        // Account identifier of the project whose contract is to be updated.
-        project_account: types::AccountId,
-        // Smart contract handler that is to be updated.
-        //
-        // Note that a smart
-        // contract is a set of handlers, each being a function that has a
-        // certain role.
-        handler: types::Handler,
-        // New code for the handler that is to be updated.
-        code: types::Code,
-        // Set of votes gathered by the update's proposer in favor of the
-        // contract update.
-        votes: types::VoteSet,
-    ) -> Result<(), error::ContractUpdateError>;
 }

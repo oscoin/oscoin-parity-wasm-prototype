@@ -68,32 +68,3 @@ pub enum CheckpointError {
     /// update list containts duplicate dependencies.
     DuplicateDependenciesError,
 }
-
-/// Description of possible failures when attempting to update a project's
-/// handler.
-pub enum ContractUpdateError {
-    /// The code for a project contract's new handler is invalid.
-    ///
-    /// By invalid, it is meant that it was rejected by the ledger (or
-    /// whichever layer is responsible for that) as improper because
-    /// e.g. it does not compile or exceeds the allowed size for a handler.
-    InvalidHandlerCodeError,
-
-    /// The project contract's `UPDATECONTRACT` handler (c.f. section 5.3 of
-    /// version  1.0 of the whitepaper) has rejected the proposed handler
-    /// update.
-    ///
-    /// As an example, consider the default pseudocode proposed for this
-    /// handler:
-    /// ```ignore
-    /// handler UPDATECONTRACT(p, h, v)
-    ///    return {o.addr | o ⭠ p.maintainers} ⊆ v
-    /// ```
-    /// A contract with such an update handler would reject all updates that
-    /// have not gathered the support of all of the project's maintainers.
-    ///
-    /// As such, if an update fails to satisfy this condition, or more
-    /// generally, the project contract's update handler, the `update_contract`
-    /// transaction should fail with this error.
-    UpdateRejectedError,
-}
