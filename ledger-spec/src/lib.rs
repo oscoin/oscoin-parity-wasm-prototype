@@ -27,24 +27,21 @@ pub trait LedgerTransactions {
         amount: types::Oscoin,
     ) -> Result<(), error::TransferError>;
 
-    /// Registering a project in the Oscoin Ledger.
+    /// Registers a project on the Oscoin Ledger and returns the new project’s ID.
     ///
-    /// This transaction's inclusion in the ledger is also subject to
-    /// discussion as there is still an unclear boundary between the account
-    /// layer and the ledger. This matter can be revisited.
+    /// The transaction’s sender account becomes the initial maintainer of the project.
+    ///
+    /// The project ID is computed by hashing the sender’s nonce and the arguments. In the current
+    /// implementation we use ethereum’s contract creation logic which generates the project ID.
     fn register_project(
-        // Account identifier of the project to be registered.
-        project_account: types::AccountId,
         // Canonical source URL of the project to be registered.
         project_source_url: types::URL,
-    ) -> Result<(), error::RegisterProjectError>;
+    ) -> Result<types::ProjectId, error::RegisterProjectError>;
 
     /// Given a certain project, `addkey` adds a key to its set of keys (c.f.
     /// section 4.4.1 of the whitepaper).
     fn addkey(
-        // Account identifier of the project to which a new maintainer is to be
-        // added.
-        project_account: types::AccountId,
+        id: types::ProjectId,
         // Account identifier of the maintainer to be added to the project's
         // key set.
         maintainer_key: types::AccountId,
@@ -53,9 +50,7 @@ pub trait LedgerTransactions {
     /// Given a certain project, `removekey` removes a key from its set of
     /// keys (c.f. section 4.4.1 of the whitepaper).
     fn removekey(
-        // Account identifier of the project from which a maintainer is to be
-        // removed.
-        project_account: types::AccountId,
+        id: types::ProjectId,
         // Account identifier of the maintainer to be removed from the
         // project's key set.
         maintainer_key: types::AccountId,
@@ -65,10 +60,7 @@ pub trait LedgerTransactions {
     ///
     /// As is the case above, this transaction may also be handled outside the
     /// ledger.
-    fn unregister_project(
-        // Account identifier of the project to be removed from the ledger.
-        project_account: types::AccountId,
-    ) -> Result<(), error::UnregisterProjectError>;
+    fn unregister_project(id: types::ProjectId) -> Result<(), error::UnregisterProjectError>;
 
     /// Checkpointing a project in Oscoin's ledger.
     fn checkpoint(

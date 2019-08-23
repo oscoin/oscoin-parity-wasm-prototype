@@ -11,6 +11,12 @@ pub struct Address;
 /// diverge.
 pub type AccountId = Address;
 
+/// Identifier for a project.
+///
+/// At present it is assumed to be the same as `Address`, but will eventually
+/// diverge.
+pub type ProjectId = Address;
+
 /// Type for Ledger public keys. Its specific data structure is not
 /// important here, just as it is with `Address`es.
 pub struct PublicKey;
