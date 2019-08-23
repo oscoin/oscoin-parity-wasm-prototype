@@ -1,8 +1,15 @@
 use std::marker::PhantomData;
 
-/// Type for Ledger addresses. Its specific data structure is not
-/// important here.
+/// Type for human-readable ledger addresses. Its specific data structure is
+/// not important here.
 pub struct Address;
+
+/// Type for account identifier. Uniquely corresponds to an account in the
+/// ledger.
+///
+/// At present it is assumed to be the same as `Address`, but will eventually
+/// diverge.
+pub type AccountId = Address;
 
 /// Type for Ledger public keys. Its specific data structure is not
 /// important here, just as it is with `Address`es.
@@ -27,7 +34,7 @@ pub struct Author;
 /// It is still unclear whether the project's keyset should be present in this
 /// data structure, or if it will be in a different layer of the protocol.
 pub struct Project {
-    pub addr: Address,
+    pub addr: AccountId,
     /// A project's latest commit hash.
     pub hash: Hash,
     pub url: URL,
@@ -60,6 +67,9 @@ pub struct HashLinkedList<T> {
 /// * what is C_sig for? It is defined but not used anywhere
 /// * what is the type of C_author? Is it the GPG public key used to sign the
 ///   commit? Is it a string with their name?
+/// Answer:
+/// TODO: author is PK of author, signoff is reviewer/approver (may be optional)
+/// TODO: both PKs associated with accs on Oscoin.
 pub struct Contribution {
     pub prev: Hash,
     pub commit: Hash,
@@ -79,7 +89,7 @@ pub enum DependencyUpdate {
     /// Constructor to add a dependency.
     Depend {
         /// Address of the project being added to the dependency list.
-        addr: Address,
+        acc: AccountId,
         /// Zero-based index of the current checkpoint, in which the
         /// dependency is being added.
         cp_index: CheckpointIndex,
@@ -87,7 +97,7 @@ pub enum DependencyUpdate {
     /// Constructor to remove a dependency.
     Undepend {
         /// Address of the project being removed from the dependency list.
-        addr: Address,
+        acc: AccountId,
         /// Zero-based index of the current checkpoint, in which the
         /// dependency is being removed.
         cp_index: CheckpointIndex,

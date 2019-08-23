@@ -15,43 +15,79 @@ pub mod types;
 /// to return any actual data if they succeed.
 pub trait LedgerTransactions {
     /// Transfer Oscoin from one account to another.
+    ///
+    /// This transaction's presence in the ledger layer is still subject to
+    /// discussion.
     fn transfer_oscoin(
-        from_addr: types::Address,
-        to_addr: types::Address,
+        // Account from which to send Oscoin.
+        from_acc: types::AccountId,
+        // Account to which Oscoin will be sent.
+        to_acc: types::AccountId,
+        // Amount of Oscoin to be sent.
         amount: types::Oscoin,
     ) -> Result<(), error::TransferError>;
 
     /// Registering a project in the Oscoin Ledger.
+    ///
+    /// This transaction's inclusion in the ledger is also subject to
+    /// discussion as there is still an unclear boundary between the account
+    /// layer and the ledger. This matter can be revisited.
     fn register_project(
-        project_address: types::Address,
+        // Account identifier of the project to be registered.
+        project_account: types::AccountId,
+        // Canonical source URL of the project to be registered.
         project_source_url: types::URL,
     ) -> Result<(), error::RegisterProjectError>;
 
     /// Given a certain project, `addkey` adds a key to its set of keys (c.f.
     /// section 4.4.1 of the whitepaper).
     fn addkey(
-        project_address: types::Address,
-        maintainer_key: types::Address,
+        // Account identifier of the project to which a new maintainer is to be
+        // added.
+        project_account: types::AccountId,
+        // Account identifier of the maintainer to be added to the project's
+        // key set.
+        maintainer_key: types::AccountId,
     ) -> Result<(), error::KeysetError>;
 
     /// Given a certain project, `removekey` removes a key from its set of
     /// keys (c.f. section 4.4.1 of the whitepaper).
     fn removekey(
-        project_address: types::Address,
-        maintainer_key: types::Address,
+        // Account identifier of the project from which a maintainer is to be
+        // removed.
+        project_account: types::AccountId,
+        // Account identifier of the maintainer to be removed from the
+        // project's key set.
+        maintainer_key: types::AccountId,
     ) -> Result<(), error::KeysetError>;
 
-    /// Unregistering a project in the Oscoin Ledger.
+    /// Unregistering a project from the Oscoin Ledger.
+    ///
+    /// As is the case above, this transaction may also be handled outside the
+    /// ledger.
     fn unregister_project(
-        project_address: types::Address,
+        // Account identifier of the project to be removed from the ledger.
+        project_account: types::AccountId,
     ) -> Result<(), error::UnregisterProjectError>;
 
     /// Checkpointing a project in Oscoin's ledger.
     fn checkpoint(
-        project_address: types::Address,
+        // Account identifier of the project to which a new checkpoint will be
+        // added.
+        project_account: types::AccountId,
+        // New project hash - if the checkpoint succeeds, this will become its
+        // current hash.
         new_project_hash: types::Hash,
+        // Canonical source project URL of the project to which a new
+        // checkpoint will be added.
         project_url: types::URL,
+        // Hash-linked list of the checkpoint's contributions. To see more
+        // about this type, go to types::Contribution.
         contribution_list: types::HashLinkedList<types::Contribution>,
+        // A vector of dependency updates. See types::DependencyUpdate
+        // for more information.
+        //
+        // It is to be treated as a list i.e. processed from left to right.
         dependency_updates: Vec<types::DependencyUpdate>,
     ) -> Result<(), error::CheckpointError>;
 }

@@ -15,9 +15,8 @@ pub enum TransferError {
 /// Oscoin ledger (`register` transaction). Not exhaustive, but should cover
 /// most common cases.
 pub enum RegisterProjectError {
-    /// The project address used to register it is already present in the
-    /// ledger.
-    AddressInUseError,
+    /// A project has already been registered at the given account identifier.
+    AccountIdInUseError,
 
     /// The canonical source URL used to register the project is invalid.
     ///
@@ -29,11 +28,12 @@ pub enum RegisterProjectError {
     /// 1. it is a proper URL as defined in [RFC 3986](https:///tools.ietf.org/html/rfc3986#section-1.1.3), and
     /// 2. it hosts the repository's page in a distributed version control
     ///    system's website e.g. GitLab, BitBucket, SourceForge, GitHub, and
-    /// 3. it can be accessed without restrictions [*]
-    /// [*] This part can be harder to define - if the URL returns permanently
-    /// returns `404`s *after* it has been inducted into the ledger, but not
-    /// before, is it still valid?
-    InvalidURLError(),
+    /// 3. it can be accessed without restrictions (^)
+    ///
+    /// (^) This part can be harder to define - if the URL permanently returns
+    /// `404`s *after* it has been inducted into the ledger, but not before,
+    /// is it still valid?
+    InvalidURLError,
 }
 
 /// Representation of errors that may occur in `addkey` or `removekey`
@@ -42,7 +42,7 @@ pub enum KeysetError {
     /// Version 1.0 of the whitepaper does not mention what happens when
     /// `addkey`/`removekey` are called with projects that have not yet been
     /// added to the ledger, so here that is tentatively treated as an error.
-    AddressNotInUseError,
+    AccountIfNotInUseError,
 }
 
 /// Errors that may happen when unregistering a project.
