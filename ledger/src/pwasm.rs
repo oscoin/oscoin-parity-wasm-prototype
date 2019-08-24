@@ -31,25 +31,29 @@ impl Env for Pwasm {
     }
 }
 
-#[cfg(test)]
+#[cfg(any(feature = "std", test))]
 use std::collections::HashMap;
 
 /// Implements [Env] using a [HashMap].
-#[cfg(test)]
+///
+/// Create an empty [TestEnv] with
+/// ```
+/// let testEnv: TestEnv = Default::default()
+/// ```
+#[cfg(any(feature = "std", test))]
+#[derive(Default)]
 pub struct TestEnv {
     state: HashMap<H256, [u8; 32]>,
 }
 
-#[cfg(test)]
+#[cfg(any(feature = "std", test))]
 impl TestEnv {
     pub fn new() -> TestEnv {
-        TestEnv {
-            state: HashMap::new(),
-        }
+        Default::default()
     }
 }
 
-#[cfg(test)]
+#[cfg(any(feature = "std", test))]
 impl Env for TestEnv {
     fn write(&mut self, key: &H256, value: &[u8; 32]) {
         self.state.insert(*key, *value);

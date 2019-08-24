@@ -65,7 +65,7 @@ jobs:
       - run:
           name: Test
           command: |
-            cargo test --all --color=always
+            cargo test --all --color=always -- --test-threads=1
 
       - save_cache:
           # "epoch" is here to ensure that we upload a new cache on each build

@@ -10,6 +10,7 @@ This repository hosts a prototype of Oscoin's Ledger API using WASM and Parity E
 
 - [Requirements](#requirements)
 - [Deploying the Ledger](#deploying-the-ledger)
+- [Using the Client](#using-the-client)
 - [Commands and Tools](#commands-and-tools)
     + [`osc-ping`](#osc-ping)
     + [`osc-deploy` from `oscoin_deploy` crate](#osc-deploy-from-oscoin_deploy-crate)
@@ -39,6 +40,28 @@ Deploying the Ledger
    write the contract address to `.oscoin_ledger_address`.
 1. Test the ledger with `cargo run --bin osc-ping`.
 
+Using the Client
+----------------
+
+The `oscoin_client` package in `./client` provides an API to read and manipulate
+the ledger hosted on a Parity Ethereum node.
+
+To use the client you need a _sender_ account address that is owned by the
+parity node. You also need the `.oscoin_ledger_address` in your current working
+directory.
+
+~~~rust
+let client = oscoin_client::Client::new_from_file(sender).unwrap();
+client
+    .register_project(project_address, url.to_string())
+    .wait()
+    .unwrap();
+~~~
+
+You can find a full example in `examples/project-registration.rs`
+
+Account management is currently handled by the Parity Ethereum node.
+
 Commands and Tools
 ------------------
 
@@ -60,4 +83,7 @@ Testing
 To run the tests
 1. Build the ledger with `./tools/build-ledger-wasm`
 2. Run the dev node with `./dev-node/run`
-3. Run `cargo test --all`
+3. Run `cargo test --all -- --test-threads=1`. (We need to run the test single
+   threaded because of [issue #13][issue-13])
+
+[issue-13]: https://github.com/oscoin/oscoin-parity-wasm-prototype/issues/13

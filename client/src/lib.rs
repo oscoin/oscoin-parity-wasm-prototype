@@ -17,7 +17,8 @@ use web3::contract::tokens::{Detokenize, Tokenize};
 use web3::contract::{Contract, Options};
 use web3::transports::http::Http;
 use web3::transports::EventLoopHandle;
-use web3::types::{Address, TransactionReceipt, U256};
+use web3::types::TransactionReceipt;
+pub use web3::types::{Address, U256};
 use web3::Web3;
 
 /// URL pointing to a parity ethereum node running on localhost.
@@ -126,6 +127,14 @@ impl Client {
 
     pub fn counter_inc(&self) -> SubmitResult {
         self.submit("counter_inc", ())
+    }
+
+    pub fn register_project(&self, account: Address, url: String) -> SubmitResult {
+        self.submit("register_project", (account, url))
+    }
+
+    pub fn get_project_url(&self, account: Address) -> QueryResult<String> {
+        self.query("get_project_url", (account,))
     }
 }
 
