@@ -758,7 +758,6 @@ dependencies = [
  "pwasm-abi-derive 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "pwasm-ethereum 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pwasm-std 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "pwasm-test 0.1.1 (git+https://github.com/paritytech/pwasm-test)",
 ]
 
 [[package]]
@@ -919,16 +918,6 @@ dependencies = [
  "pwasm-libc 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "tiny-keccak 1.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "uint 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "pwasm-test"
-version = "0.1.1"
-source = "git+https://github.com/paritytech/pwasm-test#6e621660d1513185fecf6dac5ec2fc8758ff4797"
-dependencies = [
- "pwasm-abi 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "pwasm-ethereum 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "pwasm-std 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -1928,7 +1917,6 @@ dependencies = [
 "checksum pwasm-ethereum 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)" = "8b5509e67ee47ec62bdbd1c32a6949931adbe2e12a460bb45e5dc46593fdc71c"
 "checksum pwasm-libc 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "f31d0f66477d84afab3591c08587188b46fd1ab93c1e1cb5d23f683fcc2a92b1"
 "checksum pwasm-std 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)" = "7fa5ab4637584074a26c7fe9b3516ae887a98539516d6a7075afbef5c404be5d"
-"checksum pwasm-test 0.1.1 (git+https://github.com/paritytech/pwasm-test)" = "<none>"
 "checksum quick-error 1.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "9274b940887ce9addde99c4eee6b5c44cc494b182b97e73dc8ffdcb3397fd3f0"
 "checksum quote 0.6.13 (registry+https://github.com/rust-lang/crates.io-index)" = "6ce23b6b870e8f94f81fb0a363d65d86675884b34a09043c81e5562f11c1f8e1"
 "checksum rand 0.5.6 (registry+https://github.com/rust-lang/crates.io-index)" = "c618c47cd3ebd209790115ab837de41425723956ad3ce2e6a7f09890947cacb9"
