@@ -26,13 +26,11 @@ fn register_project() {
     let ledger = oscoin_deploy::deploy().unwrap();
     let client = oscoin_client::Client::new(ledger.address());
 
+    let sender = client.new_account().wait().unwrap();
+
     let url = "https://example.com";
     client
-        .register_project(
-            dev_account_address(),
-            dev_account_address(),
-            url.to_string(),
-        )
+        .register_project(sender, dev_account_address(), url.to_string())
         .wait()
         .unwrap();
     let url2 = client

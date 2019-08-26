@@ -111,6 +111,10 @@ impl Client {
         Ok(Self::new(contract_address))
     }
 
+    pub fn new_account(&self) -> CallFuture<Address> {
+        self.web3.personal().new_account("")
+    }
+
     pub fn ping(&self) -> QueryResult<String> {
         self.query("ping", ())
     }
@@ -220,3 +224,6 @@ impl<'a> Future for SubmitResult<'a> {
         self.future.poll()
     }
 }
+
+/// [Future] for API call results with error [web3::error::Error]
+pub type CallFuture<T> = web3::helpers::CallFuture<T, <Http as web3::Transport>::Out>;
