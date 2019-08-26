@@ -22,7 +22,7 @@ pub const CONTRACT_CODE_PATH: &str = "./target/oscoin_ledger.wasm";
 const CONTRACT_ABI: &[u8] = b"[]";
 
 /// Development account address for our custom chainspec.
-pub const DEV_ACCOUNT_ADDR: &str = "00a329c0648769a73afac7f9381e08fb43dbea72";
+pub const DEV_ACCOUNT_ADDR: &str = "bcd6e47db1ac1f7f021988e20854d27778de6e4d";
 
 /// Password for the dev account
 pub const DEV_ACCOUNT_PASSWORD: &str = "";
