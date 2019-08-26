@@ -24,7 +24,7 @@ fn main() {
         )
         .get_matches();
 
-    let client = Client::new_from_file(oscoin_deploy::dev_account_address()).unwrap();
+    let client = Client::new_from_file().unwrap();
     let pong = client.ping().wait().unwrap();
     println!("{}", pong);
 }

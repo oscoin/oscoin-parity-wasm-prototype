@@ -12,10 +12,10 @@ use web3::types::U256;
 #[test]
 fn counter() {
     let ledger = oscoin_deploy::deploy().unwrap();
-    let client = oscoin_client::Client::new(dev_account_address(), ledger.address());
+    let client = oscoin_client::Client::new(ledger.address());
 
     for _ in 0..10 {
-        client.counter_inc().wait().unwrap();
+        client.counter_inc(dev_account_address()).wait().unwrap();
     }
     let counter = client.counter_value().wait().unwrap();
     assert_eq!(counter, U256::from(10));
@@ -24,11 +24,15 @@ fn counter() {
 #[test]
 fn register_project() {
     let ledger = oscoin_deploy::deploy().unwrap();
-    let client = oscoin_client::Client::new(dev_account_address(), ledger.address());
+    let client = oscoin_client::Client::new(ledger.address());
 
     let url = "https://example.com";
     client
-        .register_project(dev_account_address(), url.to_string())
+        .register_project(
+            dev_account_address(),
+            dev_account_address(),
+            url.to_string(),
+        )
         .wait()
         .unwrap();
     let url2 = client
