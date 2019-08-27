@@ -15,9 +15,6 @@ pub enum TransferError {
 /// Oscoin ledger (`register` transaction). Not exhaustive, but should cover
 /// most common cases.
 pub enum RegisterProjectError {
-    /// A project has already been registered at the given account identifier.
-    AccountIdInUseError,
-
     /// The canonical source URL used to register the project is invalid.
     ///
     /// The 1.0 version of the whitepaper establishes only one condition for
