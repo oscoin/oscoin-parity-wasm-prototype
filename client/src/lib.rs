@@ -1,11 +1,10 @@
-///! Client library for talking
+///! Client library for interacting with the oscoin ledger on a Parity Ethereum node.
 ///
 /// # Getting Started
 ///
 /// ```no_run
 /// # use futures::Future;
-/// let sender = "ef..01".parse().unwrap();
-/// let client = oscoin_client::Client::new_from_file(sender).unwrap();
+/// let client = oscoin_client::Client::new_from_file().unwrap();
 /// client.ping().wait().unwrap();
 /// ```
 use std::error;
@@ -86,16 +85,12 @@ pub struct Client {
     _event_loop_handle: EventLoopHandle,
     web3: Web3<Http>,
     contract: Contract<Http>,
-    sender: Address,
 }
 
 // Public methods
 impl Client {
     /// Creates a new client calling the ledger at the given contract address.
-    ///
-    /// `sender` is the sender of all transactions and queries submitted by the client. The
-    /// `sender` account must exist on the parity node and have an empty string as the password.
-    pub fn new(sender: Address, ledger_contract: Address) -> Client {
+    pub fn new(ledger_contract: Address) -> Client {
         let (event_loop_handle, http) = web3::transports::Http::new(LOCALHOST_NODE_URL)
             .expect("Node URL is hardcoded and valid");
         let web3 = web3::Web3::new(http);
@@ -106,15 +101,14 @@ impl Client {
             _event_loop_handle: event_loop_handle,
             web3,
             contract,
-            sender,
         }
     }
 
     /// Creates a new client using the contract address stored in [CONTRACT_ADDRESS_FILE]. See
     /// [Client::new].
-    pub fn new_from_file(sender: Address) -> Result<Client, ReadContractAddressError> {
+    pub fn new_from_file() -> Result<Client, ReadContractAddressError> {
         let contract_address = read_contract_address()?;
-        Ok(Self::new(sender, contract_address))
+        Ok(Self::new(contract_address))
     }
 
     pub fn ping(&self) -> QueryResult<String> {
@@ -125,12 +119,12 @@ impl Client {
         self.query("counter_value", ())
     }
 
-    pub fn counter_inc(&self) -> SubmitResult {
-        self.submit("counter_inc", ())
+    pub fn counter_inc(&self, sender: Address) -> SubmitResult {
+        self.submit(sender, "counter_inc", ())
     }
 
-    pub fn register_project(&self, account: Address, url: String) -> SubmitResult {
-        self.submit("register_project", (account, url))
+    pub fn register_project(&self, sender: Address, account: Address, url: String) -> SubmitResult {
+        self.submit(sender, "register_project", (account, url))
     }
 
     pub fn get_project_url(&self, account: Address) -> QueryResult<String> {
@@ -146,14 +140,9 @@ impl Client {
         method: &'a str,
         params: impl Tokenize + 'a,
     ) -> QueryResult<'a, R> {
-        let sender = self.sender;
         let future = self
-            .unlock_account_()
-            .map_err(web3::contract::Error::from)
-            .and_then(move |()| {
-                self.contract
-                    .query(method, params, Some(sender), Options::default(), None)
-            });
+            .contract
+            .query(method, params, None, Options::default(), None);
         QueryResult {
             future: Box::new(future),
         }
@@ -163,9 +152,13 @@ impl Client {
     /// ledger contract.
     ///
     /// Note that an error is only visible as a zero status in the [TransactionReceipt].
-    fn submit<'a>(&'a self, method: &'a str, params: impl Tokenize + 'a) -> SubmitResult<'a> {
-        let sender = self.sender;
-        let future = self.unlock_account_().and_then(move |()| {
+    fn submit<'a>(
+        &'a self,
+        sender: Address,
+        method: &'a str,
+        params: impl Tokenize + 'a,
+    ) -> SubmitResult<'a> {
+        let future = self.unlock_account_(sender).and_then(move |()| {
             self.contract
                 .call_with_confirmations(method, params, sender, Options::default(), 0)
         });
@@ -180,15 +173,17 @@ impl Client {
     ///
     /// TODO: Panics when the unlock RPC method responds with `false`. It should result in an
     /// error.
-    fn unlock_account_(&self) -> impl Future<Item = (), Error = web3::error::Error> {
-        let sender = self.sender;
+    fn unlock_account_(
+        &self,
+        address: Address,
+    ) -> impl Future<Item = (), Error = web3::error::Error> {
         self.web3
             .personal()
-            .unlock_account(self.sender, "", None)
+            .unlock_account(address, "", None)
             .map(move |unlocked| {
                 if !unlocked {
                     // TODO turn this into an error
-                    panic!("Failed to unlock account {}", sender)
+                    panic!("Failed to unlock account {}", address)
                 }
             })
     }
