@@ -102,9 +102,9 @@ pub trait LedgerTransactions {
         //
         // Note that a smart contract is a set of handlers, each being a
         // function that has a certain role.
-        handler: types::Handler,
+        handler: types::HandlerName,
         // New code for the handler that is to be updated.
-        code: types::Code,
+        code: types::HandlerCode,
         // Set of votes gathered by the update's proposer in favor of the
         // contract update.
         votes: types::VoteSet,

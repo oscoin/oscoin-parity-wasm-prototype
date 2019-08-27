@@ -118,13 +118,13 @@ pub struct Account {
 ///
 /// This will most likely be an specific, explicit section of the WASM
 /// smart contract that is attached to the project's account.
-pub struct Handler;
+pub struct HandlerName;
 
-/// The project handler code meant to replace the previous handler.
+/// The code meant to replace the previous code of a contract's handler.
 ///
 /// It is still to be decided what specific form this will take e.g. a WASM
 /// binary, Rust to be compiled into WASM by another layer, etc.
-pub struct Code;
+pub struct HandlerCode;
 
 /// A representation of the collection of votes the contract update's author
 /// has gathered in favor of the update.
