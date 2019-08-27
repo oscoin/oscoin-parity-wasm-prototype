@@ -38,6 +38,7 @@ pub struct Project {
     /// A project's latest commit hash.
     pub hash: Hash,
     pub url: URL,
+    pub maintainers: Vec<AccountId>,
 }
 
 /// Datatype representing a hash-linked-list. Used in the whitepaper to
@@ -102,4 +103,13 @@ pub enum DependencyUpdate {
         /// dependency is being removed.
         cp_index: CheckpointIndex,
     },
+}
+
+pub struct Account {
+    /// Transaction counter that is increased whenever a transaction is sent from this account.
+    ///
+    /// A transaction is only valid if its nonce matches the nonce of its sender account when the
+    /// transaction is applied.
+    pub nonce: u64,
+    pub balance: Oscoin,
 }
