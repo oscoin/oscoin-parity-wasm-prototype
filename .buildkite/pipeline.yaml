@@ -1,0 +1,20 @@
+steps:
+  - label: "Install components"
+    command: |
+        rustup component add rustfmt
+        rustup component add clippy
+        rustup target add wasm32-unknown-unknown
+
+  - label: "Check formatting"
+    command: 'cargo fmt --all -- --check'
+  - label: "Build"
+    command: 'RUSTFLAGS="-D warnings" cargo build --all'
+  - label: "Build ledger"
+    command: 'RUSTFLAGS="-D warnings" ./tools/build-ledger-wasm'
+  - label: "Clippy"
+    command: 'cargo clippy --all --all-targets -- -D warnings'
+  - label: "Parity Ethereum Node"
+    background: true
+    command: './dev-node/run'
+  - label: "Test"
+    command: 'cargo test --all --color=always -- --test-threads=1'
