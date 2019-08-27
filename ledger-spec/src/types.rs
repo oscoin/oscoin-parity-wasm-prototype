@@ -113,3 +113,23 @@ pub struct Account {
     pub nonce: u64,
     pub balance: Oscoin,
 }
+
+/// The project contract's handler meant to be updated.
+///
+/// This will most likely be an specific, explicit section of the WASM
+/// smart contract that is attached to the project's account.
+pub struct Handler;
+
+/// The project handler code meant to replace the previous handler.
+///
+/// It is still to be decided what specific form this will take e.g. a WASM
+/// binary, Rust to be compiled into WASM by another layer, etc.
+pub struct Code;
+
+/// A representation of the collection of votes the contract update's author
+/// has gathered in favor of the update.
+///
+/// In concrete terms, these votes can be public keys, account identifiers,
+/// or a signature of the handler update by the voter's secret key. This is yet
+/// to be decided.
+pub struct VoteSet;
