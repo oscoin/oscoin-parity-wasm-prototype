@@ -7,6 +7,8 @@
 
 set -euo pipefail
 
+project_root=$(dirname $BASH_SOURCE)/..
+
 # Rust flags to make the Wasm output small.
 rust_flags="${RUSTFLAGS:-""}"
 rust_flags+=" -C panic=abort"
@@ -17,9 +19,12 @@ rust_flags+=" -C opt-level=z"
 # produces invalid Wasm.
 rust_flags+=" -C link-args=-zstack-size=65536"
 
+# NOTE: We cannot use `cargo build --project oscoin_ledger` because
+# `--no-default-features` is not respected.
+# See https://github.com/rust-lang/cargo/issues/5015
 RUSTFLAGS=$rust_flags\
   cargo build \
-  --package oscoin_ledger \
+  --manifest-path $project_root/ledger/Cargo.toml \
   --no-default-features \
   --release \
   --target wasm32-unknown-unknown
