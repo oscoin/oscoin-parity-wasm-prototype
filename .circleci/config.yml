@@ -69,7 +69,7 @@ jobs:
 
       - save_cache:
           # "epoch" is here to ensure that we upload a new cache on each build
-          key: cargo-target-v1-{{ checksum "Cargo.lock" }}-{{ epoch }}
+          key: cargo-target-v1-{{ checksum "Cargo.lock" }}
           paths:
             - "~/.cargo"
             - "./target"
