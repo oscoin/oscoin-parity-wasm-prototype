@@ -27,11 +27,11 @@ jobs:
 
       - restore_cache:
           keys:
-          - cargo-target-v1-{{ checksum "Cargo.lock" }}
+          - cargo-target-v3-{{ checksum "Cargo.lock" }}
       - run:
           name: Install dependencies
           command: |
-            command -v wasm-build || cargo install pwasm-utils-cli --version 0.6.0 --bin wasm-build
+            command -v wasm-build || cargo install pwasm-utils-cli --version 0.10.0 --bin wasm-build
 
             wget https://releases.parity.io/ethereum/v2.6.0/x86_64-unknown-linux-gnu/parity
             echo "1b50cabc8ce54983d1b10be4c4f5887ff4ecfe63177e6c49cde819a563fb9d96  parity" > parity.sum
@@ -69,7 +69,7 @@ jobs:
 
       - save_cache:
           # "epoch" is here to ensure that we upload a new cache on each build
-          key: cargo-target-v1-{{ checksum "Cargo.lock" }}
+          key: cargo-target-v3-{{ checksum "Cargo.lock" }}
           paths:
             - "~/.cargo"
             - "./target"
