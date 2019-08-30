@@ -47,14 +47,16 @@ Using the Client
 The `oscoin_client` package in `./client` provides an API to read and manipulate
 the ledger hosted on a Parity Ethereum node.
 
-To use the client you need a _sender_ account address that is owned by the
-parity node. You also need the `.oscoin_ledger_address` in your current working
-directory.
+To use the client you need the `.oscoin_ledger_address` in your current working
+directory. This file is created by `osc-deploy`.
 
 ~~~rust
-let client = oscoin_client::Client::new_from_file(sender).unwrap();
+let client = oscoin_client::Client::new_from_file().unwrap();
+let sender = client.new_account().wait().unwrap();
+let project_address = Address::zero();
+let url = "https://example.com";
 client
-    .register_project(project_address, url.to_string())
+    .register_project(sender, project_address, url.to_string())
     .wait()
     .unwrap();
 ~~~
