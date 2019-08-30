@@ -8,7 +8,7 @@ fn main() {
     let client = Client::new_from_file().unwrap();
 
     let project_address = Address::zero();
-    let sender = oscoin_deploy::dev_account_address();
+    let sender = client.new_account().wait().unwrap();
     let url = "https://example.com";
     client
         .register_project(sender, project_address, url.to_string())
