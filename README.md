@@ -16,6 +16,7 @@ This repository hosts a prototype of Oscoin's Ledger API using WASM and Parity E
     + [`osc-deploy` from `oscoin_deploy` crate](#osc-deploy-from-oscoin_deploy-crate)
     + [`./tools/build-ledger-wasm`](#toolsbuild-ledger-wasm)
 - [Testing](#testing)
+- [Ledger Specification](#ledger-spec)
 
 <!-- tocstop -->
 
@@ -88,3 +89,29 @@ To run the tests
    threaded because of [issue #13][issue-13])
 
 [issue-13]: https://github.com/oscoin/oscoin-parity-wasm-prototype/issues/13
+
+Ledger Specification
+--------------------
+
+In the `ledger-spec` folder, there is a Rust crate that details the Oscoin
+ledger specification with traits, types and a sizable amount of documentation.
+
+It is intended to bridge the formal description of the ledger from the
+whitepaper with the ledger's future implementation, providing a "sandbox"
+with which to test and discuss design ideas before implementing them in
+earnest.
+
+The `ledger-spec` crate is meant to evolve with the project, and at each point
+in time its contents will reflect the team's requirements from and
+understanding of the Oscoin ledger.
+
+Note that although there is no actual implementation of any function or
+datatype in the crate, it compiles and is part of the build process.
+
+### Structure
+
+`ledger-spec` is a library with three modules:
+* `lib.rs`, defining the main traits with which to interact with the Oscoin
+  ledger
+* `error.rs` defining errors that may arise when interacting with the ledger.
+* `types.rs`, defining the primitive types that will populate the ledger state.
