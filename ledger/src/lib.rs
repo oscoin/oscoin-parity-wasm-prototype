@@ -13,16 +13,12 @@ pub mod storage;
 
 use storage::Storage;
 
-#[no_mangle]
 pub fn call() {
     let mut endpoint = LedgerEndpoint::new(Ledger_ {
         env: Storage { env: pwasm::Pwasm },
     });
     pwasm_ethereum::ret(&endpoint.dispatch(&pwasm_ethereum::input()));
 }
-
-#[no_mangle]
-pub fn deploy() {}
 
 #[eth_abi(LedgerEndpoint, LedgerClient)]
 pub trait Ledger {

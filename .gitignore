@@ -1,4 +1,3 @@
-/*/target
-/target
+**/target
 **/*.rs.bk
 .oscoin_ledger_address

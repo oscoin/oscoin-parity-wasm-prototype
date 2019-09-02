@@ -17,18 +17,22 @@ rust_flags+=" -C opt-level=z"
 # produces invalid Wasm.
 rust_flags+=" -C link-args=-zstack-size=65536"
 
+target=wasm32-unknown-unknown
+name=oscoin_ledger_pwasm
+
 RUSTFLAGS=$rust_flags\
   cargo build \
-  --package oscoin_ledger \
-  --no-default-features \
+  --package $name \
   --release \
-  --target wasm32-unknown-unknown
+  --target $target
 
-wasm-build --target=wasm32-unknown-unknown ./target oscoin_ledger
+wasm-build --target $target ./target $name
 
 if which wasm2wat >/dev/null 2>&1 ; then
   wasm2wat \
-    ./target/wasm32-unknown-unknown/release/oscoin_ledger.wasm \
-    > ./target/wasm32-unknown-unknown/release/oscoin_ledger.wat
-  wasm2wat ./target/oscoin_ledger.wasm > ./target/oscoin_ledger.wat
+    ./target/$target/release/$name.wasm \
+    > ./target/$target/release/$name.wat
+  wasm2wat \
+    ./target/$name.wasm \
+    > ./target/$name.wat
 fi
