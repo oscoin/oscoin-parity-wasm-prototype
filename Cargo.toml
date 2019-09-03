@@ -24,4 +24,4 @@ web3 = "0.8.0"
 web3 = { git = "https://github.com/tomusdrw/rust-web3.git", rev = "b2aa7336bc9bf192f7959e79525a6d2667ff4c85" }
 
 [workspace]
-members = ["deploy", "ledger", "ledger-spec"]
+members = ["deploy", "ledger", "ledger-spec", "ledger/pwasm"]

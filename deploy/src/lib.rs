@@ -15,8 +15,8 @@ use web3::Web3;
 /// Maximum gas used to deploy the contract
 pub const DEPLOY_GAS: u32 = 18_000_000;
 
-/// Path to the contract Wasm code. Is `./target/oscoin_ledger.wasm`.
-pub const CONTRACT_CODE_PATH: &str = "./target/oscoin_ledger.wasm";
+/// Path to the contract Wasm code. Is `./target/oscoin_ledger_pwasm.wasm`.
+pub const CONTRACT_CODE_PATH: &str = "./target/oscoin_ledger_pwasm.wasm";
 
 /// Contract ABI JSON. This is empty because there are no constructor arguments.
 const CONTRACT_ABI: &[u8] = b"[]";

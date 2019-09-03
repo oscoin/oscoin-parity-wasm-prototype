@@ -38,7 +38,8 @@ use std::collections::HashMap;
 ///
 /// Create an empty [TestEnv] with
 /// ```
-/// let testEnv: TestEnv = Default::default()
+/// # use oscoin_ledger::pwasm::*;
+/// let testEnv = TestEnv::default();
 /// ```
 #[cfg(any(feature = "std", test))]
 #[derive(Default)]

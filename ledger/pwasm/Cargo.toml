@@ -1,0 +1,16 @@
+[package]
+name = "oscoin_ledger_pwasm"
+description = "Wraps oscoin_ledger to compile it to Parity Wasm"
+version = "0.1.0"
+authors = [
+  "Alexandre Baldé <alexandre@monadic.xyz>",
+  "Thomas Scholtes <thomas@monadic.xyz>"
+]
+edition = "2018"
+
+[dependencies]
+oscoin_ledger = { path = "../" }
+
+[lib]
+crate-type = ["cdylib"]
+
