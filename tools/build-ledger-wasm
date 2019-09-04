@@ -20,9 +20,12 @@ rust_flags+=" -C link-args=-zstack-size=65536"
 target=wasm32-unknown-unknown
 name=oscoin_ledger_pwasm
 
+# We need to use --manifest-path instead of --package. Otherwise the
+# library is build with the workspace configuration and `no_std` is
+# somehow disabled.
 RUSTFLAGS=$rust_flags\
   cargo build \
-  --package $name \
+  --manifest-path ledger/pwasm/Cargo.toml \
   --release \
   --target $target
 
