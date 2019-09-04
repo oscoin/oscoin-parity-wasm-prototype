@@ -11,6 +11,11 @@ use serde::{Deserialize, Serialize};
 
 pub type ProjectId = [u8; 20];
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Project {
+    pub url: String,
+}
+
 /// Public interface of the oscoin ledger
 pub trait Ledger {
     fn ping(&mut self) -> String;
@@ -21,7 +26,7 @@ pub trait Ledger {
 
     fn register_project(&mut self, project_id: ProjectId, url: String);
 
-    fn get_project_url(&mut self, project_id: ProjectId) -> String;
+    fn get_project(&mut self, project_id: ProjectId) -> Option<Project>;
 }
 
 /// Represents a call to a ledger method. Either a [Query] or a [Update].
@@ -42,7 +47,7 @@ pub enum Call {
 pub enum Query {
     Ping,
     CounterValue,
-    GetProjectUrl { project_id: ProjectId },
+    GetProject { project_id: ProjectId },
 }
 
 /// Reified update to the ledger
@@ -84,9 +89,7 @@ pub fn dispatch(mut ledger: impl Ledger, call: Call) -> Vec<u8> {
         Call::Query(query) => match query {
             Query::Ping => serde_cbor::to_vec(&ledger.ping()),
             Query::CounterValue => serde_cbor::to_vec(&ledger.counter_value()),
-            Query::GetProjectUrl { project_id } => {
-                serde_cbor::to_vec(&ledger.get_project_url(project_id))
-            }
+            Query::GetProject { project_id } => serde_cbor::to_vec(&ledger.get_project(project_id)),
         },
         Call::Update(update) => match update {
             Update::CounterInc => serde_cbor::to_vec(&ledger.counter_inc()),

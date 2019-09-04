@@ -14,6 +14,6 @@ fn main() {
         .register_project(sender, project_address, url.to_string())
         .wait()
         .unwrap();
-    let url2 = client.get_project_url(project_address).wait().unwrap();
-    assert_eq!(url, url2);
+    let project = client.get_project(project_address).wait().unwrap().unwrap();
+    assert_eq!(url, project.url);
 }

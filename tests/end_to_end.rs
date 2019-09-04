@@ -32,9 +32,10 @@ fn register_project() {
         .register_project(sender, dev_account_address(), url.to_string())
         .wait()
         .unwrap();
-    let url2 = client
-        .get_project_url(dev_account_address())
+    let project = client
+        .get_project(dev_account_address())
         .wait()
+        .unwrap()
         .unwrap();
-    assert_eq!(url, url2);
+    assert_eq!(url, project.url);
 }

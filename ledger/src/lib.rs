@@ -9,7 +9,7 @@ pub mod pwasm;
 pub mod storage;
 
 use interface::dispatch;
-pub use interface::{Call, Ledger, ProjectId, Query, Update};
+pub use interface::{Call, Ledger, Project, ProjectId, Query, Update};
 use storage::Storage;
 
 pub fn call() {
@@ -49,14 +49,11 @@ impl Ledger for Ledger_ {
     }
 
     fn register_project(&mut self, account: ProjectId, url: String) {
-        self.storage.write(&account, &url);
+        self.storage.write(&account, &Project { url });
     }
 
-    fn get_project_url(&mut self, account: ProjectId) -> String {
-        self.storage
-            .read::<String>(&account)
-            .unwrap()
-            .unwrap_or_default()
+    fn get_project(&mut self, account: ProjectId) -> Option<Project> {
+        self.storage.read::<Project>(&account).unwrap()
     }
 }
 
@@ -87,8 +84,8 @@ mod test {
         let account = [0u8; 20];
         let url = "https://example.com";
         ledger.register_project(account, url.into());
-        let expected_url = ledger.get_project_url(account);
-        assert_eq!(url, expected_url);
+        let project = ledger.get_project(account).unwrap();
+        assert_eq!(url, project.url);
     }
 
     fn new_ledger() -> Ledger_ {
