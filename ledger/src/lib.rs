@@ -2,7 +2,7 @@
 #![feature(alloc_prelude)]
 extern crate alloc;
 
-use crate::pwasm::{String, H256, U256};
+use crate::pwasm::String;
 
 pub mod interface;
 pub mod pwasm;
@@ -14,7 +14,7 @@ use storage::Storage;
 
 pub fn call() {
     let ledger = Ledger_ {
-        env: Storage::new(pwasm::Pwasm),
+        storage: Storage::new(pwasm::Pwasm),
     };
     let call_result = Call::deserialize(pwasm_ethereum::input().as_slice());
     let call = match call_result {
@@ -29,15 +29,10 @@ pub fn call() {
 
 /// Implements [Ledger] backed by [Storage].
 pub struct Ledger_ {
-    pub env: Storage,
+    pub storage: Storage,
 }
 
-lazy_static::lazy_static! {
-    static ref COUNTER_ADDRESS: H256 =
-        H256::from(
-            [2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-        );
-}
+const COUNTER_KEY: &[u8] = b"counter";
 
 impl Ledger for Ledger_ {
     fn ping(&mut self) -> String {
@@ -45,23 +40,23 @@ impl Ledger for Ledger_ {
     }
 
     fn counter_inc(&mut self) {
-        let data = self.env.read(COUNTER_ADDRESS.as_ref());
-        let counter = U256::from(data.as_slice());
-        self.env
-            .write(COUNTER_ADDRESS.as_ref(), H256::from(counter + 1).as_ref());
+        let val: u32 = self.storage.read(COUNTER_KEY).unwrap().unwrap_or(0);
+        self.storage.write(COUNTER_KEY, &(val + 1));
     }
 
     fn counter_value(&mut self) -> u32 {
-        let data = self.env.read(COUNTER_ADDRESS.as_ref());
-        U256::from(data.as_slice()).low_u32()
+        self.storage.read(COUNTER_KEY).unwrap().unwrap_or(0)
     }
 
     fn register_project(&mut self, account: ProjectId, url: String) {
-        self.env.write(account.as_ref(), url.as_ref())
+        self.storage.write(&account, &url);
     }
 
     fn get_project_url(&mut self, account: ProjectId) -> String {
-        String::from_utf8(self.env.read(account.as_ref())).unwrap()
+        self.storage
+            .read::<String>(&account)
+            .unwrap()
+            .unwrap_or_default()
     }
 }
 
@@ -98,7 +93,7 @@ mod test {
 
     fn new_ledger() -> Ledger_ {
         Ledger_ {
-            env: Storage::new(pwasm::TestEnv::new()),
+            storage: Storage::new(pwasm::TestEnv::new()),
         }
     }
 }
