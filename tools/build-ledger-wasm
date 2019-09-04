@@ -26,7 +26,10 @@ RUSTFLAGS=$rust_flags\
   --release \
   --target $target
 
-wasm-build --target $target ./target $name
+wasm-build \
+  --target $target \
+  --save-raw ./target/${name}_raw.wasm \
+  ./target $name
 
 if which wasm2wat >/dev/null 2>&1 ; then
   wasm2wat \
@@ -35,4 +38,7 @@ if which wasm2wat >/dev/null 2>&1 ; then
   wasm2wat \
     ./target/$name.wasm \
     > ./target/$name.wat
+  wasm2wat \
+    ./target/${name}_raw.wasm \
+    > ./target/${name}_raw.wat
 fi
