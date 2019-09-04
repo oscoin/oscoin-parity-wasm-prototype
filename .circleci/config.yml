@@ -31,7 +31,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            command -v wasm-build || cargo install pwasm-utils-cli --version 0.10.0 --bin wasm-build
+            cargo build --package pwasm-utils-cli --bin wasm-build
 
             wget https://releases.parity.io/ethereum/v2.6.0/x86_64-unknown-linux-gnu/parity
             echo "1b50cabc8ce54983d1b10be4c4f5887ff4ecfe63177e6c49cde819a563fb9d96  parity" > parity.sum

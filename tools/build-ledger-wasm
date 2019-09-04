@@ -26,7 +26,7 @@ RUSTFLAGS=$rust_flags\
   --release \
   --target $target
 
-wasm-build \
+./target/debug/wasm-build \
   --target $target \
   --save-raw ./target/${name}_raw.wasm \
   ./target $name
