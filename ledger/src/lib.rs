@@ -3,6 +3,7 @@
 extern crate alloc;
 
 use alloc::prelude::v1::*;
+use alloc::vec;
 
 use crate::pwasm::String;
 
@@ -59,7 +60,8 @@ impl Ledger for Ledger_ {
     }
 
     fn register_project(&mut self, account: ProjectId, url: String) {
-        self.storage().write(&account, &Project { url });
+        let members = vec![self.env.sender().to_fixed_bytes()];
+        self.storage().write(&account, &Project { url, members });
     }
 
     fn get_project(&mut self, account: ProjectId) -> Option<Project> {
@@ -70,6 +72,7 @@ impl Ledger for Ledger_ {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::pwasm::Address;
 
     #[test]
     fn counter_inc() {
@@ -95,10 +98,17 @@ mod test {
         let url = "https://example.com";
         ledger.register_project(account, url.into());
         let project = ledger.get_project(account).unwrap();
-        assert_eq!(url, project.url);
+        assert_eq!(project.url, url);
+        assert_eq!(project.members, vec![test_sender().to_fixed_bytes()]);
     }
 
     fn new_ledger() -> Ledger_ {
-        Ledger_::new(pwasm::TestEnv::new())
+        let mut test_env = pwasm::TestEnv::new();
+        test_env.sender = test_sender();
+        Ledger_::new(test_env)
+    }
+
+    fn test_sender() -> Address {
+        Address::from_low_u64_le(123_456_789)
     }
 }
