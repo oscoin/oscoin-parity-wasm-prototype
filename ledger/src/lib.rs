@@ -14,7 +14,7 @@ use storage::Storage;
 
 pub fn call() {
     let ledger = Ledger_ {
-        env: Storage { env: pwasm::Pwasm },
+        env: Storage::new(pwasm::Pwasm),
     };
     let call_result = Call::deserialize(pwasm_ethereum::input().as_slice());
     let call = match call_result {
@@ -28,8 +28,8 @@ pub fn call() {
 }
 
 /// Implements [Ledger] backed by [Storage].
-pub struct Ledger_<E: pwasm::Env> {
-    pub env: Storage<E>,
+pub struct Ledger_ {
+    pub env: Storage,
 }
 
 lazy_static::lazy_static! {
@@ -39,7 +39,7 @@ lazy_static::lazy_static! {
         );
 }
 
-impl<E: pwasm::Env> Ledger for Ledger_<E> {
+impl Ledger for Ledger_ {
     fn ping(&mut self) -> String {
         String::from("pong")
     }
@@ -96,11 +96,9 @@ mod test {
         assert_eq!(url, expected_url);
     }
 
-    fn new_ledger() -> Ledger_<pwasm::TestEnv> {
+    fn new_ledger() -> Ledger_ {
         Ledger_ {
-            env: Storage {
-                env: pwasm::TestEnv::new(),
-            },
+            env: Storage::new(pwasm::TestEnv::new()),
         }
     }
 }
