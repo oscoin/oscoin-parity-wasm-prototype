@@ -9,8 +9,7 @@ authors = [
 edition = "2018"
 
 [dependencies]
-oscoin_ledger = { path = "../" }
+oscoin_ledger = { path = "../", default-features = false, features = ["panic_with_msg"] }
 
 [lib]
 crate-type = ["cdylib"]
-

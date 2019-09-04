@@ -13,7 +13,7 @@ use web3::types::Address;
 use web3::Web3;
 
 /// Maximum gas used to deploy the contract
-pub const DEPLOY_GAS: u32 = 18_000_000;
+pub const DEPLOY_GAS: u32 = 100_000_000;
 
 /// Path to the contract Wasm code. Is `./target/oscoin_ledger_pwasm.wasm`.
 pub const CONTRACT_CODE_PATH: &str = "./target/oscoin_ledger_pwasm.wasm";

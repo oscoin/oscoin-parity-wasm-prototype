@@ -12,20 +12,18 @@ use std::fmt;
 use std::str::FromStr;
 
 use futures::future::Future;
-use web3::contract::tokens::{Detokenize, Tokenize};
-use web3::contract::{Contract, Options};
 use web3::transports::http::Http;
 use web3::transports::EventLoopHandle;
 use web3::types::TransactionReceipt;
 pub use web3::types::{Address, U256};
 use web3::Web3;
 
+use oscoin_ledger::{Call as LedgerCall, Query as LedgerQuery, Update as LedgerUpdate};
+
 /// URL pointing to a parity ethereum node running on localhost.
 ///
 /// This is the URL used by the client. It is currently not possible to change it.
 const LOCALHOST_NODE_URL: &str = "http://localhost:8545";
-
-const CONTRACT_ABI_JSON: &[u8] = include_bytes!("../../target/json/Ledger.json");
 
 /// File Path to load and store the ledger contract address to. Is `./.oscoin_ledger_address`.
 pub const CONTRACT_ADDRESS_FILE: &str = "./.oscoin_ledger_address";
@@ -84,23 +82,20 @@ pub fn read_contract_address() -> Result<Address, ReadContractAddressError> {
 pub struct Client {
     _event_loop_handle: EventLoopHandle,
     web3: Web3<Http>,
-    contract: Contract<Http>,
+    ledger_address: Address,
 }
 
 // Public methods
 impl Client {
     /// Creates a new client calling the ledger at the given contract address.
-    pub fn new(ledger_contract: Address) -> Client {
+    pub fn new(ledger_address: Address) -> Client {
         let (event_loop_handle, http) = web3::transports::Http::new(LOCALHOST_NODE_URL)
             .expect("Node URL is hardcoded and valid");
         let web3 = web3::Web3::new(http);
-        let contract_abi =
-            ethabi::Contract::load(CONTRACT_ABI_JSON).expect("ABI is hardcoded and valid");
-        let contract = Contract::new(web3.eth(), ledger_contract, contract_abi.clone());
         Client {
             _event_loop_handle: event_loop_handle,
             web3,
-            contract,
+            ledger_address,
         }
     }
 
@@ -116,37 +111,64 @@ impl Client {
     }
 
     pub fn ping(&self) -> QueryResult<String> {
-        self.query("ping", ())
+        self.query(LedgerQuery::Ping)
     }
 
-    pub fn counter_value(&self) -> QueryResult<U256> {
-        self.query("counter_value", ())
+    pub fn counter_value(&self) -> QueryResult<u32> {
+        self.query(LedgerQuery::CounterValue)
     }
 
     pub fn counter_inc(&self, sender: Address) -> SubmitResult {
-        self.submit(sender, "counter_inc", ())
+        self.submit(sender, LedgerUpdate::CounterInc)
     }
 
     pub fn register_project(&self, sender: Address, account: Address, url: String) -> SubmitResult {
-        self.submit(sender, "register_project", (account, url))
+        self.submit(
+            sender,
+            LedgerUpdate::RegisterProject {
+                project_id: account.to_fixed_bytes(),
+                url,
+            },
+        )
     }
 
     pub fn get_project_url(&self, account: Address) -> QueryResult<String> {
-        self.query("get_project_url", (account,))
+        self.query(LedgerQuery::GetProjectUrl {
+            project_id: account.to_fixed_bytes(),
+        })
     }
 }
 
 // Private methods
 impl Client {
     /// Queries the ledger contract by calling a method with the given parameters.
-    fn query<'a, R: Detokenize + 'a>(
-        &'a self,
-        method: &'a str,
-        params: impl Tokenize + 'a,
-    ) -> QueryResult<'a, R> {
+    fn query<R: serde::de::DeserializeOwned + 'static>(
+        &self,
+        query: LedgerQuery,
+    ) -> QueryResult<R> {
+        let data = LedgerCall::Query(query).serialize();
         let future = self
-            .contract
-            .query(method, params, None, Options::default(), None);
+            .web3
+            .eth()
+            .call(
+                web3::types::CallRequest {
+                    from: None,
+                    to: self.ledger_address,
+                    gas: None,
+                    gas_price: None,
+                    value: None,
+                    data: Some(web3::types::Bytes(data)),
+                },
+                None,
+            )
+            .and_then(|web3::types::Bytes(vec)| {
+                serde_cbor::from_slice(&vec).map_err(|err| {
+                    web3::error::Error::InvalidResponse(format!(
+                        "Failed to decode CBOR response: {}",
+                        err
+                    ))
+                })
+            });
         QueryResult {
             future: Box::new(future),
         }
@@ -156,16 +178,29 @@ impl Client {
     /// ledger contract.
     ///
     /// Note that an error is only visible as a zero status in the [TransactionReceipt].
-    fn submit<'a>(
-        &'a self,
-        sender: Address,
-        method: &'a str,
-        params: impl Tokenize + 'a,
-    ) -> SubmitResult<'a> {
+    fn submit(&self, sender: Address, update: LedgerUpdate) -> SubmitResult {
+        let data = LedgerCall::Update(update).serialize();
+        let transaction_request = web3::types::TransactionRequest {
+            from: sender,
+            to: Some(self.ledger_address),
+            gas: None,
+            gas_price: None,
+            value: None,
+            nonce: None,
+            data: Some(web3::types::Bytes(data)),
+            condition: None,
+        };
+
+        let poll_interval = core::time::Duration::from_secs(1);
         let future = self.unlock_account_(sender).and_then(move |()| {
-            self.contract
-                .call_with_confirmations(method, params, sender, Options::default(), 0)
+            web3::confirm::send_transaction_with_confirmation(
+                self.web3.transport().clone(),
+                transaction_request,
+                poll_interval,
+                0,
+            )
         });
+
         SubmitResult {
             future: Box::new(future),
         }
@@ -197,12 +232,12 @@ impl Client {
 ///
 /// The [Future] interfaces allows one to retrieve the result of the query.
 pub struct QueryResult<'a, T> {
-    future: Box<dyn Future<Item = T, Error = web3::contract::Error> + 'a>,
+    future: Box<dyn Future<Item = T, Error = web3::error::Error> + 'a>,
 }
 
 impl<'a, T> Future for QueryResult<'a, T> {
     type Item = T;
-    type Error = web3::contract::Error;
+    type Error = web3::error::Error;
 
     fn poll(&mut self) -> futures::Poll<Self::Item, Self::Error> {
         self.future.poll()
