@@ -6,7 +6,11 @@ authors = ["Thomas Scholtes <thomas@monadic.xyz>"]
 edition = "2018"
 
 [dependencies]
-web3 = "0.8.0"
+oscoin_ledger = { path = "../ledger" }
+
 ethabi = "8.0.0"
-rustc-hex = "2.0.1"
 futures = "0.1.28"
+rustc-hex = "2.0.1"
+serde = "1.0"
+serde_cbor = "=0.10.0"
+web3 = "0.8.0"

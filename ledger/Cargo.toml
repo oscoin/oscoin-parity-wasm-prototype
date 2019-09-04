@@ -11,12 +11,18 @@ edition = "2018"
 pwasm-std = "0.13"
 pwasm-ethereum = "0.8"
 pwasm-abi = "0.2"
-pwasm-abi-derive = "0.2"
-lazy_static = "1.3.0"
+lazy_static = { version = "1.3.0", features = ["spin_no_std"] }
+serde = { version = "1.0", default-features = false, features = ["derive", "alloc"] }
+serde_cbor = { version = "=0.10.0", default-features = false, features = ["alloc"] }
 
 [features]
 default = ["std"]
-std = ["pwasm-std/std", "pwasm-ethereum/std"]
+std = [
+  "pwasm-std/std",
+  "pwasm-ethereum/std",
+  "serde_cbor/std",
+  "serde/std",
+  ]
 # If enabled panics will provide the formatted message to the Wasm
 # runtime. This simplifies debugging.
 panic_with_msg = [ "pwasm-std/panic_with_msg" ]

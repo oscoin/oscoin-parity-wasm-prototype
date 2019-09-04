@@ -1,39 +1,30 @@
 #![cfg_attr(all(not(test), not(feature = "std")), no_std)]
-#![allow(non_snake_case)]
-#![feature(proc_macro_hygiene)]
+#![feature(alloc_prelude)]
+extern crate alloc;
 
-use pwasm_abi_derive::eth_abi;
-// Implements the dispatch and dispatch_ctor methods
-use pwasm_abi::eth::EndpointInterface;
+use crate::pwasm::{String, H256, U256};
 
-use crate::pwasm::{Address, String, H256, U256};
-
+pub mod interface;
 pub mod pwasm;
 pub mod storage;
 
+use interface::dispatch;
+pub use interface::{Call, Ledger, ProjectId, Query, Update};
 use storage::Storage;
 
 pub fn call() {
-    let mut endpoint = LedgerEndpoint::new(Ledger_ {
+    let ledger = Ledger_ {
         env: Storage { env: pwasm::Pwasm },
-    });
-    pwasm_ethereum::ret(&endpoint.dispatch(&pwasm_ethereum::input()));
-}
-
-#[eth_abi(LedgerEndpoint, LedgerClient)]
-pub trait Ledger {
-    #[constant]
-    fn ping(&mut self) -> String;
-
-    fn counter_inc(&mut self);
-
-    #[constant]
-    fn counter_value(&mut self) -> U256;
-
-    fn register_project(&mut self, account: Address, url: String);
-
-    #[constant]
-    fn get_project_url(&mut self, account: Address) -> String;
+    };
+    let call_result = Call::deserialize(pwasm_ethereum::input().as_slice());
+    let call = match call_result {
+        Ok(call) => call,
+        Err(err) => {
+            panic!("Failed to deserialize ledger call: {}", err);
+        }
+    };
+    let response = dispatch(ledger, call);
+    pwasm_ethereum::ret(&response);
 }
 
 /// Implements [Ledger] backed by [Storage].
@@ -60,16 +51,16 @@ impl<E: pwasm::Env> Ledger for Ledger_<E> {
             .write(COUNTER_ADDRESS.as_ref(), H256::from(counter + 1).as_ref());
     }
 
-    fn counter_value(&mut self) -> U256 {
+    fn counter_value(&mut self) -> u32 {
         let data = self.env.read(COUNTER_ADDRESS.as_ref());
-        U256::from(data.as_slice())
+        U256::from(data.as_slice()).low_u32()
     }
 
-    fn register_project(&mut self, account: Address, url: String) {
+    fn register_project(&mut self, account: ProjectId, url: String) {
         self.env.write(account.as_ref(), url.as_ref())
     }
 
-    fn get_project_url(&mut self, account: Address) -> String {
+    fn get_project_url(&mut self, account: ProjectId) -> String {
         String::from_utf8(self.env.read(account.as_ref())).unwrap()
     }
 }
@@ -85,20 +76,20 @@ mod test {
             ledger.counter_inc()
         }
         let counter = ledger.counter_value();
-        assert_eq!(counter, U256::from(10));
+        assert_eq!(counter, 10);
     }
 
     #[test]
     fn counter_default() {
         let mut ledger = new_ledger();
         let counter = ledger.counter_value();
-        assert_eq!(counter, U256::from(0));
+        assert_eq!(counter, 0);
     }
 
     #[test]
     fn register_project() {
         let mut ledger = new_ledger();
-        let account = Address::zero();
+        let account = [0u8; 20];
         let url = "https://example.com";
         ledger.register_project(account, url.into());
         let expected_url = ledger.get_project_url(account);

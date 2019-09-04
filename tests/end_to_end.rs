@@ -7,7 +7,6 @@
 //! counter.
 use oscoin_deploy::dev_account_address;
 use web3::futures::Future;
-use web3::types::U256;
 
 #[test]
 fn counter() {
@@ -18,7 +17,7 @@ fn counter() {
         client.counter_inc(dev_account_address()).wait().unwrap();
     }
     let counter = client.counter_value().wait().unwrap();
-    assert_eq!(counter, U256::from(10));
+    assert_eq!(counter, 10);
 }
 
 #[test]
