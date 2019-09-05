@@ -5,22 +5,29 @@
 //!
 //! ```
 //! # use oscoin_ledger::storage::Storage;
-//! let mut storage = Storage { env: oscoin_ledger::pwasm::TestEnv::new() };
+//! let mut storage = Storage::new(oscoin_ledger::pwasm::TestEnv::new());
 //! let some_bytes = Vec::from(b"abcdef" as &[u8]);
 //! storage.write("key".as_ref(), some_bytes.as_ref());
 //! assert_eq!(some_bytes, storage.read("key".as_ref()));
 //! ```
 use crate::pwasm;
 use crate::pwasm::{Vec, H256, U256};
+use alloc::prelude::v1::*;
 
-pub struct Storage<E: pwasm::Env> {
-    pub env: E,
+pub struct Storage {
+    env: Box<dyn pwasm::Env + 'static>,
+}
+
+impl Storage {
+    pub fn new(env: impl pwasm::Env + 'static) -> Storage {
+        Storage { env: Box::new(env) }
+    }
 }
 
 /// Number of bytes that can be stored with the pwasm environment
 const CHUNK_SIZE: usize = 32;
 
-impl<E: pwasm::Env> Storage<E> {
+impl Storage {
     pub fn write(&mut self, key: &[u8], value: &[u8]) {
         let key_hash = U256::from(pwasm_std::keccak(key));
         let u256_len = U256::from(value.len());
