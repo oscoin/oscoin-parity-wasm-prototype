@@ -1,6 +1,5 @@
 use crate::pwasm;
 use crate::pwasm::{Vec, H256, U256};
-use alloc::prelude::v1::*;
 
 /// Number of bytes that can be stored with the pwasm environment
 const CHUNK_SIZE: usize = 32;
@@ -9,7 +8,8 @@ const CHUNK_SIZE: usize = 32;
 ///
 /// ```
 /// # use oscoin_ledger::storage::Storage;
-/// let mut storage = Storage::new(oscoin_ledger::pwasm::TestEnv::new());
+/// let mut test_env = oscoin_ledger::pwasm::TestEnv::new();
+/// let mut storage = Storage::new(&mut test_env);
 /// let vec = Vec::from(b"abcdef" as &[u8]);
 /// storage.write(b"key", &vec);
 /// assert_eq!(Some(vec), storage.read(b"key").unwrap());
@@ -28,13 +28,13 @@ const CHUNK_SIZE: usize = 32;
 ///
 /// [solidity-store]: https://medium.com/@hayeah/diving-into-the-ethereum-vm-the-hidden-costs-of-arrays-28e119f04a9b
 ///
-pub struct Storage {
-    env: Box<dyn pwasm::Env + 'static>,
+pub struct Storage<'a> {
+    env: &'a mut dyn pwasm::Env,
 }
 
-impl Storage {
-    pub fn new(env: impl pwasm::Env + 'static) -> Storage {
-        Storage { env: Box::new(env) }
+impl<'a> Storage<'a> {
+    pub fn new(env: &mut dyn pwasm::Env) -> Storage {
+        Storage { env }
     }
 
     pub fn read<T: serde::de::DeserializeOwned>(
@@ -51,7 +51,7 @@ impl Storage {
 
     pub fn write<T: serde::Serialize>(&mut self, key: &[u8], value: &T) {
         let data = serde_cbor::to_vec(value).expect("Serialization can never fail");
-        self.write_bytes(key, data.as_ref())
+        self.write_bytes(key, &data)
     }
 
     fn write_bytes(&mut self, key: &[u8], value: &[u8]) {

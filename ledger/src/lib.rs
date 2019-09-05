@@ -2,6 +2,8 @@
 #![feature(alloc_prelude)]
 extern crate alloc;
 
+use alloc::prelude::v1::*;
+
 use crate::pwasm::String;
 
 pub mod interface;
@@ -13,9 +15,7 @@ pub use interface::{Call, Ledger, Project, ProjectId, Query, Update};
 use storage::Storage;
 
 pub fn call() {
-    let ledger = Ledger_ {
-        storage: Storage::new(pwasm::Pwasm),
-    };
+    let ledger = Ledger_::new(pwasm::Pwasm);
     let call_result = Call::deserialize(pwasm_ethereum::input().as_slice());
     let call = match call_result {
         Ok(call) => call,
@@ -29,7 +29,17 @@ pub fn call() {
 
 /// Implements [Ledger] backed by [Storage].
 pub struct Ledger_ {
-    pub storage: Storage,
+    env: Box<dyn pwasm::Env>,
+}
+
+impl Ledger_ {
+    pub fn new(env: impl pwasm::Env + 'static) -> Ledger_ {
+        Ledger_ { env: Box::new(env) }
+    }
+
+    fn storage(&mut self) -> Storage {
+        Storage::new(self.env.as_mut())
+    }
 }
 
 const COUNTER_KEY: &[u8] = b"counter";
@@ -40,20 +50,20 @@ impl Ledger for Ledger_ {
     }
 
     fn counter_inc(&mut self) {
-        let val: u32 = self.storage.read(COUNTER_KEY).unwrap().unwrap_or(0);
-        self.storage.write(COUNTER_KEY, &(val + 1));
+        let val: u32 = self.storage().read(COUNTER_KEY).unwrap().unwrap_or(0);
+        self.storage().write(COUNTER_KEY, &(val + 1));
     }
 
     fn counter_value(&mut self) -> u32 {
-        self.storage.read(COUNTER_KEY).unwrap().unwrap_or(0)
+        self.storage().read(COUNTER_KEY).unwrap().unwrap_or(0)
     }
 
     fn register_project(&mut self, account: ProjectId, url: String) {
-        self.storage.write(&account, &Project { url });
+        self.storage().write(&account, &Project { url });
     }
 
     fn get_project(&mut self, account: ProjectId) -> Option<Project> {
-        self.storage.read::<Project>(&account).unwrap()
+        self.storage().read::<Project>(&account).unwrap()
     }
 }
 
@@ -89,8 +99,6 @@ mod test {
     }
 
     fn new_ledger() -> Ledger_ {
-        Ledger_ {
-            storage: Storage::new(pwasm::TestEnv::new()),
-        }
+        Ledger_::new(pwasm::TestEnv::new())
     }
 }
