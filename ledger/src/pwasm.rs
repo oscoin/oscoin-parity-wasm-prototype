@@ -1,13 +1,13 @@
 //! Access to Parity Wasm primitives
 //!
-//! [Env] defines a trait for all methods the ledger runtime needs to provide. When the ledger runs
+//! [pwasm::Env] defines a trait for all methods the ledger runtime needs to provide. When the ledger runs
 //! as a Parity Wasm Smart Contract thhe functionality is provided by `Pwasm` using the
 //! `pwasm_ethereum` crate.
 //!
-//! For testing purposes a [TestEnv] implementation is provided.
+//! For testing purposes a [pwasm::TestEnv] implementation is provided.
 //!
 //! Oscoin Ledger code must not use `pwasm_ethereum` directly. It must only use functionality
-//! exposed by [Env].
+//! exposed by [pwasm::Env].
 
 #[doc(inline)]
 pub use pwasm_abi::types::*;
