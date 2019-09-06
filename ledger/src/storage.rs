@@ -1,19 +1,33 @@
-//! Storage backend for [Ledger_] that is more powerful than the primitive Pwasm ethereum storage.
-//!
-//! The storage provided by the [pwasm] primitives is limited to 32 byte values. [Storage] provides
-//! a storage that can store arbitrarily large values.
-//!
-//! ```
-//! # use oscoin_ledger::storage::Storage;
-//! let mut storage = Storage::new(oscoin_ledger::pwasm::TestEnv::new());
-//! let some_bytes = Vec::from(b"abcdef" as &[u8]);
-//! storage.write("key".as_ref(), some_bytes.as_ref());
-//! assert_eq!(some_bytes, storage.read("key".as_ref()));
-//! ```
 use crate::pwasm;
 use crate::pwasm::{Vec, H256, U256};
 use alloc::prelude::v1::*;
 
+/// Number of bytes that can be stored with the pwasm environment
+const CHUNK_SIZE: usize = 32;
+
+/// Simple key-value store for serializable data that is backed by [pwasm::Env].
+///
+/// ```
+/// # use oscoin_ledger::storage::Storage;
+/// let mut storage = Storage::new(oscoin_ledger::pwasm::TestEnv::new());
+/// let vec = Vec::from(b"abcdef" as &[u8]);
+/// storage.write(b"key", &vec);
+/// assert_eq!(Some(vec), storage.read(b"key").unwrap());
+/// ```
+///
+/// # Implementation
+///
+/// [Storage] is implemented on top of [pwasm::Env] which provides a key-value store for fixed 32
+/// byte keys and values. To store a key-value pair  we first serialize the value to `Vec<u8>`.
+/// Then we compute the 32 byte key (say `0x123`) by hashing the storage key. We then store the
+/// length of the serialized data as the value at `0x123`. (This requires us to expand `u32` to
+/// 32 bytes). Then we store the serialized data in the subsequent keys, that is `0x124`, `0x125`,
+/// etc. Reading a value reverses this process.
+///
+/// This mechanism is similar to [what Solidity does][solidity-store].
+///
+/// [solidity-store]: https://medium.com/@hayeah/diving-into-the-ethereum-vm-the-hidden-costs-of-arrays-28e119f04a9b
+///
 pub struct Storage {
     env: Box<dyn pwasm::Env + 'static>,
 }
@@ -22,13 +36,25 @@ impl Storage {
     pub fn new(env: impl pwasm::Env + 'static) -> Storage {
         Storage { env: Box::new(env) }
     }
-}
 
-/// Number of bytes that can be stored with the pwasm environment
-const CHUNK_SIZE: usize = 32;
+    pub fn read<T: serde::de::DeserializeOwned>(
+        &mut self,
+        key: &[u8],
+    ) -> serde_cbor::Result<Option<T>> {
+        let data = self.read_bytes(key);
+        if data.is_empty() {
+            Ok(None)
+        } else {
+            serde_cbor::from_slice(&data)
+        }
+    }
 
-impl Storage {
-    pub fn write(&mut self, key: &[u8], value: &[u8]) {
+    pub fn write<T: serde::Serialize>(&mut self, key: &[u8], value: &T) {
+        let data = serde_cbor::to_vec(value).expect("Serialization can never fail");
+        self.write_bytes(key, data.as_ref())
+    }
+
+    fn write_bytes(&mut self, key: &[u8], value: &[u8]) {
         let key_hash = U256::from(pwasm_std::keccak(key));
         let u256_len = U256::from(value.len());
         self.env
@@ -40,7 +66,7 @@ impl Storage {
         }
     }
 
-    pub fn read(&mut self, key: &[u8]) -> Vec<u8> {
+    fn read_bytes(&mut self, key: &[u8]) -> Vec<u8> {
         let key_hash = pwasm_std::keccak(key);
         let mut data = Vec::new();
         let mut data_to_read = U256::from(self.env.read(&key_hash)).as_usize();
