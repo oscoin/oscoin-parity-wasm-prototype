@@ -22,9 +22,10 @@ pwasm-utils-cli = "0.10.0"
 
 
 [patch.crates-io]
-# We require the patch https://github.com/tomusdrw/rust-web3/pull/242.
+# We require the patches https://github.com/tomusdrw/rust-web3/pull/242
+# and https://github.com/tomusdrw/rust-web3/pull/250
 # Once a new version of web3 is released we can update it.
-web3 = { git = "https://github.com/tomusdrw/rust-web3.git", rev = "b2aa7336bc9bf192f7959e79525a6d2667ff4c85" }
+web3 = { git = "https://github.com/tomusdrw/rust-web3.git", rev = "db4443ee16765c0754a87d9359d8f6b9e0c04d3a" }
 # See https://github.com/paritytech/wasm-utils/pull/132
 pwasm-utils-cli = { git = "https://github.com/oscoin/wasm-utils.git", branch = "pack-min-pages" }
 # See https://github.com/oscoin/oscoin-parity-wasm-prototype/pull/45
