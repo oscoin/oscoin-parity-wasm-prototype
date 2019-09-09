@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ci_dir=$(dirname $BASH_SOURCE)
+project_dir=$(dirname $ci_dir)
+cp $project_dir/tools/rustup-setup $ci_dir
+docker build \
+  --build-arg RUST_TOOLCHAIN="$(cat $project_dir/rust-toolchain)" \
+  --tag gcr.io/opensourcecoin/oscoin-pwasm-ci-base \
+  $ci_dir

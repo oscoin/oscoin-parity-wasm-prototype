@@ -1,7 +1,7 @@
 jobs:
   build:
     docker:
-      - image: circleci/rust:1.36-buster
+      - image: gcr.io/opensourcecoin/oscoin-pwasm-ci-base:latest
 
     steps:
       - checkout
@@ -18,29 +18,11 @@ jobs:
             echo 'function cargo () { /usr/local/cargo/bin/cargo --locked "$@"; }' >> $BASH_ENV
       - restore_cache:
           keys:
-          - rustup-v5-{{ checksum "rust-toolchain" }}-{{ checksum "tools/rustup-setup" }}
-      - run:
-          name: Setup toolchain
-          command: ./tools/rustup-setup
-      - save_cache:
-          key: rustup-v5-{{ checksum "rust-toolchain" }}-{{ checksum "tools/rustup-setup" }}
-          paths:
-            - "~/.rustup"
-
-      - restore_cache:
-          keys:
           - cargo-target-v4-{{ checksum "Cargo.lock" }}
       - run:
           name: Install dependencies
           command: |
             cargo build --package pwasm-utils-cli --bin wasm-build
-
-            wget https://releases.parity.io/ethereum/v2.6.0/x86_64-unknown-linux-gnu/parity
-            echo "1b50cabc8ce54983d1b10be4c4f5887ff4ecfe63177e6c49cde819a563fb9d96  parity" > parity.sum
-            sha256sum parity.sum
-            chmod +x parity
-            sudo mv parity /usr/local/bin
-
       - run:
           name: Check formatting
           command: |

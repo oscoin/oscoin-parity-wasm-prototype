@@ -1,0 +1,3 @@
+# Ignore everything by default and add files explicitly
+**/*
+!./rustup-setup
