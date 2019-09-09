@@ -9,6 +9,7 @@ edition = "2018"
 oscoin_ledger = { path = "../ledger" }
 
 ethabi = "8.0.0"
+ethereum-types = "^0.6.0"
 futures = "0.1.28"
 rustc-hex = "2.0.1"
 serde = "1.0"

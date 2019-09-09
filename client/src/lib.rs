@@ -1,3 +1,4 @@
+use std::convert::From;
 ///! Client library for interacting with the oscoin ledger on a Parity Ethereum node.
 ///
 /// # Getting Started
@@ -11,6 +12,7 @@ use std::error;
 use std::fmt;
 use std::str::FromStr;
 
+use ethereum_types::U64;
 use futures::future::Future;
 use web3::transports::http::Http;
 use web3::transports::EventLoopHandle;
@@ -199,6 +201,14 @@ impl Client {
                 poll_interval,
                 0,
             )
+            .map(move |tx_receipt| match tx_receipt.status {
+                Some(U64([0])) => {
+                    return futures::future::err(web3::error::Error::InvalidResponse(
+                        "Transaction receipt `status` field is 0: transaction failure.".to_string(),
+                    ))
+                }
+                _ => futures::future::result(Ok(tx_receipt)),
+            })
         });
 
         SubmitResult {
