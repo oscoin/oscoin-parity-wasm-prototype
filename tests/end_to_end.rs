@@ -28,15 +28,11 @@ fn register_project() {
     let sender = client.new_account().wait().unwrap();
 
     let url = "https://example.com";
-    client
-        .register_project(sender, dev_account_address(), url.to_string())
+    let project_id = client
+        .register_project(sender, url.to_string())
         .wait()
         .unwrap();
-    let project = client
-        .get_project(dev_account_address())
-        .wait()
-        .unwrap()
-        .unwrap();
+    let project = client.get_project(project_id).wait().unwrap().unwrap();
 
     assert_eq!(url, project.url);
     assert_eq!(project.members, vec![sender.to_fixed_bytes()]);
