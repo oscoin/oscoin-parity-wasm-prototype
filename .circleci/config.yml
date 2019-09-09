@@ -6,11 +6,16 @@ jobs:
     steps:
       - checkout
       - run:
-          name: "Setup custom environment variables"
+          name: "Setup shell environment"
           command: |
+            # Since we run the scripts as root the rustup and cargo
+            # homes are located under /usr/local/.
             echo 'export RUSTUP_HOME=$HOME/.rustup' >> $BASH_ENV
             echo 'export CARGO_HOME=$HOME/.cargo' >> $BASH_ENV
-            echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $BASH_ENV
+
+            # Alias `cargo` to `cargo --locked` to avoid inadvertant
+            # updates to `Cargo.lock`.
+            echo 'function cargo () { /usr/local/cargo/bin/cargo --locked "$@"; }' >> $BASH_ENV
       - restore_cache:
           keys:
           - rustup-v5-{{ checksum "rust-toolchain" }}-{{ checksum "tools/rustup-setup" }}
@@ -24,7 +29,7 @@ jobs:
 
       - restore_cache:
           keys:
-          - cargo-target-v3-{{ checksum "Cargo.lock" }}
+          - cargo-target-v4-{{ checksum "Cargo.lock" }}
       - run:
           name: Install dependencies
           command: |
@@ -66,7 +71,7 @@ jobs:
 
       - save_cache:
           # "epoch" is here to ensure that we upload a new cache on each build
-          key: cargo-target-v3-{{ checksum "Cargo.lock" }}
+          key: cargo-target-v4-{{ checksum "Cargo.lock" }}
           paths:
             - "~/.cargo"
             - "./target"
