@@ -13,15 +13,12 @@ jobs:
             echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $BASH_ENV
       - restore_cache:
           keys:
-          - rustup-v4-{{ checksum "rust-toolchain" }}
+          - rustup-v5-{{ checksum "rust-toolchain" }}-{{ checksum "tools/rustup-setup" }}
       - run:
-          name: Install components
-          command: |
-            rustup component add rustfmt
-            rustup component add clippy
-            rustup target add wasm32-unknown-unknown
+          name: Setup toolchain
+          command: ./tools/rustup-setup
       - save_cache:
-          key: rustup-v4-{{ checksum "rust-toolchain" }}
+          key: rustup-v5-{{ checksum "rust-toolchain" }}-{{ checksum "tools/rustup-setup" }}
           paths:
             - "~/.rustup"
 

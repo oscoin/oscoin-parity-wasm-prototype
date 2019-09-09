@@ -28,8 +28,8 @@ Requirements
 
 * [`rustup`](https://github.com/rust-lang/rustup.rs/)
 * [Latest version][peth-release] of the Parity Ethereum node on the PATH
+* Setup Rust toolchain with `./tools/rustup-setup`
 * `cargo build --package pwasm-utils-cli --bin wasm-build`
-* `rustup target add wasm32-unknown-unknown`
 
 [peth-release]: https://github.com/paritytech/parity-ethereum/releases/latest
 
