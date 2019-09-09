@@ -132,8 +132,8 @@ impl Client {
         )
     }
 
-    pub fn get_project_url(&self, account: Address) -> QueryResult<String> {
-        self.query(LedgerQuery::GetProjectUrl {
+    pub fn get_project(&self, account: Address) -> QueryResult<Option<oscoin_ledger::Project>> {
+        self.query(LedgerQuery::GetProject {
             project_id: account.to_fixed_bytes(),
         })
     }
