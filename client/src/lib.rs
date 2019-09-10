@@ -194,22 +194,22 @@ impl Client {
         };
 
         let poll_interval = core::time::Duration::from_secs(1);
-        let future = self.unlock_account_(sender).and_then(move |()| {
-            web3::confirm::send_transaction_with_confirmation(
-                self.web3.transport().clone(),
-                transaction_request,
-                poll_interval,
-                0,
-            )
-            .map(move |tx_receipt| match tx_receipt.status {
-                Some(U64([0])) => {
-                    return futures::future::err(web3::error::Error::InvalidResponse(
-                        "Transaction receipt `status` field is 0: transaction failure.".to_string(),
-                    ))
-                }
-                _ => futures::future::result(Ok(tx_receipt)),
+        let future = self
+            .unlock_account_(sender)
+            .and_then(move |()| {
+                web3::confirm::send_transaction_with_confirmation(
+                    self.web3.transport().clone(),
+                    transaction_request,
+                    poll_interval,
+                    0,
+                )
             })
-        });
+            .and_then(move |tx_receipt| match tx_receipt.status {
+                Some(U64([0])) => futures::future::err(web3::error::Error::InvalidResponse(
+                    "Transaction receipt `status` field is 0: transaction failure.".to_string(),
+                )),
+                _ => futures::future::result(Ok(tx_receipt)),
+            });
 
         SubmitResult {
             future: Box::new(future),
