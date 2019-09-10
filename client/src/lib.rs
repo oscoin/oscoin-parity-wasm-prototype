@@ -73,6 +73,13 @@ impl From<std::io::Error> for ReadContractAddressError {
     }
 }
 
+#[derive(Debug)]
+pub enum ClientError {
+    TransactionError(String),
+    Web3Error(web3::error::Error),
+    AccountUnlockingError(String),
+}
+
 pub fn read_contract_address() -> Result<Address, ReadContractAddressError> {
     let contract_address_hex = std::fs::read_to_string(CONTRACT_ADDRESS_FILE)?;
     Address::from_str(&contract_address_hex).map_err(ReadContractAddressError::HexError)
@@ -204,8 +211,9 @@ impl Client {
                     0,
                 )
             })
+            .map_err(ClientError::Web3Error)
             .and_then(move |tx_receipt| match tx_receipt.status {
-                Some(U64([0])) => Err(web3::error::Error::InvalidResponse(
+                Some(U64([0])) => Err(ClientError::TransactionError(
                     "Transaction receipt `status` field is 0: transaction failure.".to_string(),
                 )),
                 _ => Ok(tx_receipt),
@@ -258,17 +266,17 @@ impl<'a, T> Future for QueryResult<'a, T> {
 ///
 /// The [Future] interfaces allows one to retrieve the result of the query.
 pub struct SubmitResult<'a> {
-    future: Box<dyn Future<Item = TransactionReceipt, Error = web3::Error> + 'a>,
+    future: Box<dyn Future<Item = TransactionReceipt, Error = ClientError> + 'a>,
 }
 
 impl<'a> Future for SubmitResult<'a> {
     type Item = TransactionReceipt;
-    type Error = web3::Error;
+    type Error = ClientError;
 
     fn poll(&mut self) -> futures::Poll<Self::Item, Self::Error> {
         self.future.poll()
     }
 }
 
-/// [Future] for API call results with error [web3::error::Error]
+/// [Future] for API call results with error `ClientError`.
 pub type CallFuture<T> = web3::helpers::CallFuture<T, <Http as web3::Transport>::Out>;
