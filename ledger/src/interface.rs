@@ -10,10 +10,12 @@ use alloc::prelude::v1::*;
 use serde::{Deserialize, Serialize};
 
 pub type ProjectId = [u8; 20];
+pub type AccountId = [u8; 20];
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Project {
     pub url: String,
+    pub members: Vec<AccountId>,
 }
 
 /// Public interface of the oscoin ledger

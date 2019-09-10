@@ -37,5 +37,7 @@ fn register_project() {
         .wait()
         .unwrap()
         .unwrap();
+
     assert_eq!(url, project.url);
+    assert_eq!(project.members, vec![sender.to_fixed_bytes()]);
 }

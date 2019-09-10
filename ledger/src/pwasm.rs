@@ -16,6 +16,7 @@ pub use pwasm_abi::types::*;
 pub trait Env {
     fn write(&mut self, key: &H256, value: &[u8; 32]);
     fn read(&self, key: &H256) -> [u8; 32];
+    fn sender(&self) -> Address;
 }
 
 /// Implements [Env] for the Parity Wasm Smart Contract environment using the `pwasm_ethereum` crate.
@@ -29,41 +30,54 @@ impl Env for Pwasm {
     fn read(&self, key: &H256) -> [u8; 32] {
         pwasm_ethereum::read(key)
     }
-}
 
-#[cfg(any(feature = "std", test))]
-use std::collections::HashMap;
-
-/// Implements [Env] using a [HashMap].
-///
-/// Create an empty [TestEnv] with
-/// ```
-/// # use oscoin_ledger::pwasm::*;
-/// let testEnv = TestEnv::default();
-/// ```
-#[cfg(any(feature = "std", test))]
-#[derive(Default)]
-pub struct TestEnv {
-    state: HashMap<H256, [u8; 32]>,
-}
-
-#[cfg(any(feature = "std", test))]
-impl TestEnv {
-    pub fn new() -> TestEnv {
-        Default::default()
+    fn sender(&self) -> Address {
+        pwasm_ethereum::sender()
     }
 }
 
 #[cfg(any(feature = "std", test))]
-impl Env for TestEnv {
-    fn write(&mut self, key: &H256, value: &[u8; 32]) {
-        self.state.insert(*key, *value);
+pub use test_env::*;
+
+#[cfg(any(feature = "std", test))]
+mod test_env {
+    use super::*;
+
+    use std::collections::HashMap;
+
+    /// Implements [Env] using a [HashMap].
+    ///
+    /// Create an empty [TestEnv] with
+    /// ```
+    /// # use oscoin_ledger::pwasm::*;
+    /// let testEnv = TestEnv::default();
+    /// ```
+    #[derive(Default)]
+    pub struct TestEnv {
+        state: HashMap<H256, [u8; 32]>,
+        pub sender: Address,
     }
 
-    fn read(&self, key: &H256) -> [u8; 32] {
-        match self.state.get(key) {
-            Some(value) => *value,
-            None => Default::default(),
+    impl TestEnv {
+        pub fn new() -> TestEnv {
+            Default::default()
+        }
+    }
+
+    impl Env for TestEnv {
+        fn write(&mut self, key: &H256, value: &[u8; 32]) {
+            self.state.insert(*key, *value);
+        }
+
+        fn read(&self, key: &H256) -> [u8; 32] {
+            match self.state.get(key) {
+                Some(value) => *value,
+                None => Default::default(),
+            }
+        }
+
+        fn sender(&self) -> Address {
+            self.sender
         }
     }
 }
