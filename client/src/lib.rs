@@ -205,10 +205,10 @@ impl Client {
                 )
             })
             .and_then(move |tx_receipt| match tx_receipt.status {
-                Some(U64([0])) => futures::future::err(web3::error::Error::InvalidResponse(
+                Some(U64([0])) => Err(web3::error::Error::InvalidResponse(
                     "Transaction receipt `status` field is 0: transaction failure.".to_string(),
                 )),
-                _ => futures::future::result(Ok(tx_receipt)),
+                _ => Ok(tx_receipt),
             });
 
         SubmitResult {
