@@ -48,6 +48,8 @@ Using the Client
 The `oscoin_client` package in `./client` provides an API to read and manipulate
 the ledger hosted on a Parity Ethereum node.
 
+To compile the `oscoin_client` package a nightly Rust release is required.
+
 To use the client you need the `.oscoin_ledger_address` in your current working
 directory. This file is created by `osc-deploy`.
 
