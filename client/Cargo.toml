@@ -13,5 +13,9 @@ ethereum-types = "^0.6.0"
 futures = "0.1.28"
 rustc-hex = "2.0.1"
 serde = "1.0"
-serde_cbor = "=0.10.0"
-web3 = "0.8.0"
+# See https://github.com/oscoin/oscoin-parity-wasm-prototype/pull/45
+serde_cbor = { git = "https://github.com/pyfisch/cbor.git", rev = "2c7ed27f0ecf89cdf2883586ad40dde1f216df6e" }
+# We require the patches https://github.com/tomusdrw/rust-web3/pull/242
+# and https://github.com/tomusdrw/rust-web3/pull/250
+# Once a new version of web3 is released we can update it.
+web3 = { git = "https://github.com/tomusdrw/rust-web3.git", rev = "db4443ee16765c0754a87d9359d8f6b9e0c04d3a" }

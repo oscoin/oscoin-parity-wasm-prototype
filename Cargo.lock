@@ -766,7 +766,7 @@ dependencies = [
  "oscoin_ledger 0.1.0",
  "rustc-hex 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.99 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_cbor 0.10.0 (git+https://github.com/geigerzaehler/cbor.git?branch=to-vec-no-std)",
+ "serde_cbor 0.10.1 (git+https://github.com/pyfisch/cbor.git?rev=2c7ed27f0ecf89cdf2883586ad40dde1f216df6e)",
  "web3 0.8.0 (git+https://github.com/tomusdrw/rust-web3.git?rev=db4443ee16765c0754a87d9359d8f6b9e0c04d3a)",
 ]
 
@@ -789,7 +789,7 @@ dependencies = [
  "pwasm-ethereum 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pwasm-std 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.99 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_cbor 0.10.0 (git+https://github.com/geigerzaehler/cbor.git?branch=to-vec-no-std)",
+ "serde_cbor 0.10.1 (git+https://github.com/pyfisch/cbor.git?rev=2c7ed27f0ecf89cdf2883586ad40dde1f216df6e)",
 ]
 
 [[package]]
@@ -1280,8 +1280,8 @@ dependencies = [
 
 [[package]]
 name = "serde_cbor"
-version = "0.10.0"
-source = "git+https://github.com/geigerzaehler/cbor.git?branch=to-vec-no-std#6f7020ac083820bfa64d52e063e676b0eab715a4"
+version = "0.10.1"
+source = "git+https://github.com/pyfisch/cbor.git?rev=2c7ed27f0ecf89cdf2883586ad40dde1f216df6e#2c7ed27f0ecf89cdf2883586ad40dde1f216df6e"
 dependencies = [
  "byteorder 1.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "half 1.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -2035,7 +2035,7 @@ dependencies = [
 "checksum semver 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)" = "1d7eb9ef2c18661902cc47e535f9bc51b78acd254da71d375c2f6720d9a40403"
 "checksum semver-parser 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)" = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 "checksum serde 1.0.99 (registry+https://github.com/rust-lang/crates.io-index)" = "fec2851eb56d010dc9a21b89ca53ee75e6528bab60c11e89d38390904982da9f"
-"checksum serde_cbor 0.10.0 (git+https://github.com/geigerzaehler/cbor.git?branch=to-vec-no-std)" = "<none>"
+"checksum serde_cbor 0.10.1 (git+https://github.com/pyfisch/cbor.git?rev=2c7ed27f0ecf89cdf2883586ad40dde1f216df6e)" = "<none>"
 "checksum serde_derive 1.0.99 (registry+https://github.com/rust-lang/crates.io-index)" = "cb4dc18c61206b08dc98216c98faa0232f4337e1e1b8574551d5bad29ea1b425"
 "checksum serde_json 1.0.40 (registry+https://github.com/rust-lang/crates.io-index)" = "051c49229f282f7c6f3813f8286cc1e3323e8051823fce42c7ea80fe13521704"
 "checksum sha1 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)" = "2579985fda508104f7587689507983eadd6a6e84dd35d6d115361f530916fa0d"

@@ -15,21 +15,14 @@ clap = "2.31"
 env_logger = "0.6.2"
 futures = "0.1.28"
 hex = "0.3.1"
-web3 = "0.8.0"
-
-[dev-dependencies]
-pwasm-utils-cli = "0.10.0"
-
-
-[patch.crates-io]
 # We require the patches https://github.com/tomusdrw/rust-web3/pull/242
 # and https://github.com/tomusdrw/rust-web3/pull/250
 # Once a new version of web3 is released we can update it.
 web3 = { git = "https://github.com/tomusdrw/rust-web3.git", rev = "db4443ee16765c0754a87d9359d8f6b9e0c04d3a" }
+
+[dev-dependencies]
 # See https://github.com/paritytech/wasm-utils/pull/132
 pwasm-utils-cli = { git = "https://github.com/oscoin/wasm-utils.git", branch = "pack-min-pages" }
-# See https://github.com/oscoin/oscoin-parity-wasm-prototype/pull/45
-serde_cbor = { git = "https://github.com/geigerzaehler/cbor.git", branch = "to-vec-no-std" }
 
 [workspace]
 members = ["deploy", "ledger", "ledger-spec", "ledger/pwasm"]
