@@ -17,7 +17,7 @@ use futures::future::Future;
 use web3::transports::http::Http;
 use web3::transports::EventLoopHandle;
 use web3::types::TransactionReceipt;
-pub use web3::types::{Address, U256};
+pub use web3::types::{Address, H256, U256};
 use web3::Web3;
 
 use oscoin_ledger::{Call as LedgerCall, Query as LedgerQuery, Update as LedgerUpdate};
@@ -75,9 +75,33 @@ impl From<std::io::Error> for ReadContractAddressError {
 
 #[derive(Debug)]
 pub enum ClientError {
-    TransactionError(String),
+    /// Returns the ID of the failed transaction.
+    /// Transaction failure is signaled by the `status` field in
+    /// `TransactionReceipt.`
+    TransactionFailureError(H256),
     Web3Error(web3::error::Error),
-    AccountUnlockingError(String),
+}
+
+impl fmt::Display for ClientError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::TransactionFailureError(hash) => write!(
+                f,
+                "Transaction execution failure. Transaction ID is: {}",
+                hash
+            ),
+            Self::Web3Error(web3_error) => fmt::Display::fmt(&web3_error, f),
+        }
+    }
+}
+
+impl error::Error for ClientError {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        match self {
+            Self::TransactionFailureError(_) => None,
+            Self::Web3Error(web3_error) => Some(web3_error),
+        }
+    }
 }
 
 pub fn read_contract_address() -> Result<Address, ReadContractAddressError> {
@@ -213,8 +237,8 @@ impl Client {
             })
             .map_err(ClientError::Web3Error)
             .and_then(move |tx_receipt| match tx_receipt.status {
-                Some(U64([0])) => Err(ClientError::TransactionError(
-                    "Transaction receipt `status` field is 0: transaction failure.".to_string(),
+                Some(U64([0])) => Err(ClientError::TransactionFailureError(
+                    tx_receipt.transaction_hash,
                 )),
                 _ => Ok(tx_receipt),
             });
