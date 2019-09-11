@@ -1,3 +1,4 @@
+use std::convert::From;
 ///! Client library for interacting with the oscoin ledger on a Parity Ethereum node.
 ///
 /// # Getting Started
@@ -11,11 +12,12 @@ use std::error;
 use std::fmt;
 use std::str::FromStr;
 
+use ethereum_types::U64;
 use futures::future::Future;
 use web3::transports::http::Http;
 use web3::transports::EventLoopHandle;
 use web3::types::TransactionReceipt;
-pub use web3::types::{Address, U256};
+pub use web3::types::{Address, H256, U256};
 use web3::Web3;
 
 use oscoin_ledger::{Call as LedgerCall, Query as LedgerQuery, Update as LedgerUpdate};
@@ -68,6 +70,37 @@ impl From<rustc_hex::FromHexError> for ReadContractAddressError {
 impl From<std::io::Error> for ReadContractAddressError {
     fn from(io_error: std::io::Error) -> ReadContractAddressError {
         ReadContractAddressError::IoError(io_error)
+    }
+}
+
+#[derive(Debug)]
+pub enum ClientError {
+    /// Returns the ID of the failed transaction.
+    /// Transaction failure is signaled by the `status` field in
+    /// `TransactionReceipt.`
+    TransactionFailureError(H256),
+    Web3Error(web3::error::Error),
+}
+
+impl fmt::Display for ClientError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::TransactionFailureError(hash) => write!(
+                f,
+                "Transaction execution failure. Transaction ID is: {}",
+                hash
+            ),
+            Self::Web3Error(web3_error) => fmt::Display::fmt(&web3_error, f),
+        }
+    }
+}
+
+impl error::Error for ClientError {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        match self {
+            Self::TransactionFailureError(_) => None,
+            Self::Web3Error(web3_error) => Some(web3_error),
+        }
     }
 }
 
@@ -192,14 +225,23 @@ impl Client {
         };
 
         let poll_interval = core::time::Duration::from_secs(1);
-        let future = self.unlock_account_(sender).and_then(move |()| {
-            web3::confirm::send_transaction_with_confirmation(
-                self.web3.transport().clone(),
-                transaction_request,
-                poll_interval,
-                0,
-            )
-        });
+        let future = self
+            .unlock_account_(sender)
+            .and_then(move |()| {
+                web3::confirm::send_transaction_with_confirmation(
+                    self.web3.transport().clone(),
+                    transaction_request,
+                    poll_interval,
+                    0,
+                )
+            })
+            .map_err(ClientError::Web3Error)
+            .and_then(move |tx_receipt| match tx_receipt.status {
+                Some(U64([0])) => Err(ClientError::TransactionFailureError(
+                    tx_receipt.transaction_hash,
+                )),
+                _ => Ok(tx_receipt),
+            });
 
         SubmitResult {
             future: Box::new(future),
@@ -248,17 +290,17 @@ impl<'a, T> Future for QueryResult<'a, T> {
 ///
 /// The [Future] interfaces allows one to retrieve the result of the query.
 pub struct SubmitResult<'a> {
-    future: Box<dyn Future<Item = TransactionReceipt, Error = web3::Error> + 'a>,
+    future: Box<dyn Future<Item = TransactionReceipt, Error = ClientError> + 'a>,
 }
 
 impl<'a> Future for SubmitResult<'a> {
     type Item = TransactionReceipt;
-    type Error = web3::Error;
+    type Error = ClientError;
 
     fn poll(&mut self) -> futures::Poll<Self::Item, Self::Error> {
         self.future.poll()
     }
 }
 
-/// [Future] for API call results with error [web3::error::Error]
+/// [Future] for API call results with error `ClientError`.
 pub type CallFuture<T> = web3::helpers::CallFuture<T, <Http as web3::Transport>::Out>;
