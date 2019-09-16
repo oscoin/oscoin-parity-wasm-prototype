@@ -2,6 +2,8 @@
 #![feature(alloc_prelude)]
 extern crate alloc;
 
+use alloc::collections::BTreeSet;
+
 use alloc::prelude::v1::*;
 use alloc::vec;
 
@@ -44,6 +46,7 @@ impl Ledger_ {
 }
 
 const COUNTER_KEY: &[u8] = b"counter";
+const PROJECTS_KEY: &[u8] = b"projects";
 
 impl Ledger for Ledger_ {
     fn ping(&mut self) -> String {
@@ -61,13 +64,23 @@ impl Ledger for Ledger_ {
 
     fn register_project(&mut self, url: String) -> ProjectId {
         let members = vec![self.env.sender().to_fixed_bytes()];
+        let project = Project { url, members };
+        let projects = BTreeSet::insert(&mut self.list_projects(), project.clone());
         let id = compute_project_id(self.env.sender(), self.env.block_number());
-        self.storage().write(&id, &Project { url, members });
+        self.storage().write(&id, &project);
+        self.storage().write(PROJECTS_KEY, &projects);
         id
     }
 
     fn get_project(&mut self, account: ProjectId) -> Option<Project> {
         self.storage().read::<Project>(&account).unwrap()
+    }
+
+    fn list_projects(&mut self) -> BTreeSet<Project> {
+        self.storage()
+            .read(PROJECTS_KEY)
+            .expect("Project list is successfully read from ledger")
+            .unwrap_or_default()
     }
 }
 

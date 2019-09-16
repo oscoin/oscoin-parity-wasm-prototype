@@ -6,13 +6,14 @@
 //! [Query] or [Update] constructor. With [dispatch] the method corresponding to a given [Call] is
 //! called on a [Ledger] implementation.
 use crate::pwasm::String;
-use alloc::prelude::v1::*;
+use alloc::collections::BTreeSet;
+use alloc::prelude::v1::Vec;
 use serde::{Deserialize, Serialize};
 
 pub type ProjectId = [u8; 20];
 pub type AccountId = [u8; 20];
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Ord, Eq, PartialEq, PartialOrd, Clone)]
 pub struct Project {
     pub url: String,
     pub members: Vec<AccountId>,
@@ -29,6 +30,8 @@ pub trait Ledger {
     fn register_project(&mut self, url: String) -> ProjectId;
 
     fn get_project(&mut self, project_id: ProjectId) -> Option<Project>;
+
+    fn list_projects(&mut self) -> BTreeSet<Project>;
 }
 
 /// Represents a call to a ledger method. Either a [Query] or a [Update].
@@ -50,6 +53,7 @@ pub enum Query {
     Ping,
     CounterValue,
     GetProject { project_id: ProjectId },
+    ListProjects,
 }
 
 /// Reified update to the ledger
@@ -92,6 +96,7 @@ pub fn dispatch(mut ledger: impl Ledger, call: Call) -> Vec<u8> {
             Query::Ping => serde_cbor::to_vec(&ledger.ping()),
             Query::CounterValue => serde_cbor::to_vec(&ledger.counter_value()),
             Query::GetProject { project_id } => serde_cbor::to_vec(&ledger.get_project(project_id)),
+            Query::ListProjects => serde_cbor::to_vec(&ledger.list_projects()),
         },
         Call::Update(update) => match update {
             Update::CounterInc => serde_cbor::to_vec(&ledger.counter_inc()),

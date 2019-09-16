@@ -1,3 +1,4 @@
+use std::collections::BTreeSet;
 use std::convert::From;
 ///! Client library for interacting with the oscoin ledger on a Parity Ethereum node.
 ///
@@ -21,7 +22,8 @@ pub use web3::types::{Address, H256, U256};
 use web3::Web3;
 
 use oscoin_ledger::{
-    compute_project_id, Call as LedgerCall, ProjectId, Query as LedgerQuery, Update as LedgerUpdate,
+    compute_project_id, Call as LedgerCall, Project, ProjectId, Query as LedgerQuery,
+    Update as LedgerUpdate,
 };
 
 /// URL pointing to a parity ethereum node running on localhost.
@@ -176,6 +178,10 @@ impl Client {
         project_id: ProjectId,
     ) -> QueryResult<Option<oscoin_ledger::Project>> {
         self.query(LedgerQuery::GetProject { project_id })
+    }
+
+    pub fn list_projects(&self) -> QueryResult<BTreeSet<Project>> {
+        self.query(LedgerQuery::ListProjects)
     }
 }
 
