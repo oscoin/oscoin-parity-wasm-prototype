@@ -233,11 +233,13 @@ impl Client {
 
         let poll_interval = core::time::Duration::from_secs(1);
         let future = self
-            .unlock_account_(sender)
-            .and_then(move |()| {
-                web3::confirm::send_transaction_with_confirmation(
+            .web3
+            .personal()
+            .sign_transaction(transaction_request, "")
+            .and_then(move |signed_tx| {
+                web3::confirm::send_raw_transaction_with_confirmation(
                     self.web3.transport().clone(),
-                    transaction_request,
+                    signed_tx.raw,
                     poll_interval,
                     0,
                 )
@@ -253,27 +255,6 @@ impl Client {
         SubmitResult {
             future: Box::new(future),
         }
-    }
-
-    /// Unlock the node account used by the client.
-    /// Note the `_` at the end to differentiate from the same function
-    /// imported from `web3`.
-    ///
-    /// TODO: Panics when the unlock RPC method responds with `false`. It should result in an
-    /// error.
-    fn unlock_account_(
-        &self,
-        address: Address,
-    ) -> impl Future<Item = (), Error = web3::error::Error> {
-        self.web3
-            .personal()
-            .unlock_account(address, "", None)
-            .map(move |unlocked| {
-                if !unlocked {
-                    // TODO turn this into an error
-                    panic!("Failed to unlock account {}", address)
-                }
-            })
     }
 }
 

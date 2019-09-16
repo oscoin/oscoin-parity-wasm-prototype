@@ -35,8 +35,7 @@ pub const CONTRACT_ADDRESS_FILE: &str = "./.oscoin_ledger_address";
 /// Deploys the contract.
 ///
 /// 1. Read the contract code from [CONTRACT_CODE_PATH].
-/// 2. Unlock [DEV_ACCOUNT_ADDR]
-/// 3. Deploy the contract with [DEV_ACCOUNT_ADDR] as the sender
+/// 2. Deploy the contract with [DEV_ACCOUNT_ADDR] as the sender.
 ///
 /// **Note:** This contract blocks on IO.
 pub fn deploy() -> Result<Contract<web3::transports::Http>, String> {
@@ -52,13 +51,13 @@ pub fn deploy() -> Result<Contract<web3::transports::Http>, String> {
             opt.gas = Some(DEPLOY_GAS.into());
         }));
 
-    web3.personal()
-        .unlock_account(dev_account_address(), DEV_ACCOUNT_PASSWORD, None)
-        .wait()
-        .map_err(|e| format!("Failed to unlock dev account: {}", e))?;
-
     let pending_contract = builder
-        .execute(hex::encode(contract_code), (), dev_account_address())
+        .sign_and_execute(
+            hex::encode(contract_code),
+            (),
+            dev_account_address(),
+            DEV_ACCOUNT_PASSWORD,
+        )
         .expect("Correct parameters are passed to the constructor.");
 
     let contract = pending_contract
