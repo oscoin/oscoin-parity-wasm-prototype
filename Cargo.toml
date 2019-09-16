@@ -15,10 +15,11 @@ clap = "2.31"
 env_logger = "0.6.2"
 futures = "0.1.28"
 hex = "0.3.1"
-# We require the patches https://github.com/tomusdrw/rust-web3/pull/242
-# and https://github.com/tomusdrw/rust-web3/pull/250
+# We require the patches https://github.com/tomusdrw/rust-web3/pull/242,
+# https://github.com/tomusdrw/rust-web3/pull/250 and
+# https://github.com/tomusdrw/rust-web3/pull/252.
 # Once a new version of web3 is released we can update it.
-web3 = { git = "https://github.com/tomusdrw/rust-web3.git", rev = "db4443ee16765c0754a87d9359d8f6b9e0c04d3a" }
+web3 = { git = "https://github.com/tomusdrw/rust-web3.git", rev = "48267cbb5f7d86fe777a07566fe2cbb1102f2ed1" }
 
 [dev-dependencies]
 # See https://github.com/paritytech/wasm-utils/pull/132
