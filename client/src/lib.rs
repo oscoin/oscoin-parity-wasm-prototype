@@ -76,32 +76,32 @@ impl From<std::io::Error> for ReadContractAddressError {
 }
 
 #[derive(Debug)]
-pub enum ClientError {
+pub enum Error {
     /// Returns the ID of the failed transaction.
     /// Transaction failure is signaled by the `status` field in
     /// `TransactionReceipt.`
-    TransactionFailureError(H256),
-    Web3Error(web3::error::Error),
+    TransactionFailure(H256),
+    Web3(web3::error::Error),
 }
 
-impl fmt::Display for ClientError {
+impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::TransactionFailureError(hash) => write!(
+            Self::TransactionFailure(hash) => write!(
                 f,
                 "Transaction execution failure. Transaction ID is: {}",
                 hash
             ),
-            Self::Web3Error(web3_error) => fmt::Display::fmt(&web3_error, f),
+            Self::Web3(web3_error) => fmt::Display::fmt(&web3_error, f),
         }
     }
 }
 
-impl error::Error for ClientError {
+impl error::Error for Error {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         match self {
-            Self::TransactionFailureError(_) => None,
-            Self::Web3Error(web3_error) => Some(web3_error),
+            Self::TransactionFailure(_) => None,
+            Self::Web3(web3_error) => Some(web3_error),
         }
     }
 }
@@ -161,7 +161,7 @@ impl Client {
         &'a self,
         sender: Address,
         url: String,
-    ) -> impl Future<Item = ProjectId, Error = ClientError> + 'a {
+    ) -> impl Future<Item = ProjectId, Error = Error> + 'a {
         self.submit(sender, LedgerUpdate::RegisterProject { url })
             .map(move |receipt| {
                 let block = receipt
@@ -244,11 +244,9 @@ impl Client {
                     0,
                 )
             })
-            .map_err(ClientError::Web3Error)
+            .map_err(Error::Web3)
             .and_then(move |tx_receipt| match tx_receipt.status {
-                Some(U64([0])) => Err(ClientError::TransactionFailureError(
-                    tx_receipt.transaction_hash,
-                )),
+                Some(U64([0])) => Err(Error::TransactionFailure(tx_receipt.transaction_hash)),
                 _ => Ok(tx_receipt),
             });
 
@@ -278,17 +276,17 @@ impl<'a, T> Future for QueryResult<'a, T> {
 ///
 /// The [Future] interfaces allows one to retrieve the result of the query.
 pub struct SubmitResult<'a> {
-    future: Box<dyn Future<Item = TransactionReceipt, Error = ClientError> + 'a>,
+    future: Box<dyn Future<Item = TransactionReceipt, Error = Error> + 'a>,
 }
 
 impl<'a> Future for SubmitResult<'a> {
     type Item = TransactionReceipt;
-    type Error = ClientError;
+    type Error = Error;
 
     fn poll(&mut self) -> futures::Poll<Self::Item, Self::Error> {
         self.future.poll()
     }
 }
 
-/// [Future] for API call results with error `ClientError`.
+/// [Future] for API call results with error [web3::error::Error].
 pub type CallFuture<T> = web3::helpers::CallFuture<T, <Http as web3::Transport>::Out>;
