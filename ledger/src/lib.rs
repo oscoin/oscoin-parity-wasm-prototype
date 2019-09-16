@@ -5,7 +5,7 @@ extern crate alloc;
 use alloc::prelude::v1::*;
 use alloc::vec;
 
-use crate::pwasm::String;
+use crate::pwasm::{Address, String};
 
 pub mod interface;
 pub mod pwasm;
@@ -59,14 +59,32 @@ impl Ledger for Ledger_ {
         self.storage().read(COUNTER_KEY).unwrap().unwrap_or(0)
     }
 
-    fn register_project(&mut self, account: ProjectId, url: String) {
+    fn register_project(&mut self, url: String) -> ProjectId {
         let members = vec![self.env.sender().to_fixed_bytes()];
-        self.storage().write(&account, &Project { url, members });
+        let id = compute_project_id(self.env.sender(), self.env.block_number());
+        self.storage().write(&id, &Project { url, members });
+        id
     }
 
     fn get_project(&mut self, account: ProjectId) -> Option<Project> {
         self.storage().read::<Project>(&account).unwrap()
     }
+}
+
+/// Computes the ID of a project registered by `creator` in the given block through a cryptographic
+/// hash.
+///
+/// *FIXME* Two project registration transactions from the same author in the same block will
+/// result in the same project ID. In this case the first project is overwritten. We could prevent
+/// this by including the account nonce in the computation but this is unavialble from the Pwasm
+/// environment.
+pub fn compute_project_id(creator: Address, block_number: u64) -> ProjectId {
+    let mut data = Vec::from(creator.as_bytes());
+    data.extend_from_slice(&block_number.to_be_bytes());
+    let hash = pwasm_std::keccak(&data);
+    let mut project_id: [u8; 20] = Default::default();
+    project_id.copy_from_slice(&hash[0..20]);
+    project_id
 }
 
 #[cfg(test)]
@@ -94,10 +112,9 @@ mod test {
     #[test]
     fn register_project() {
         let mut ledger = new_ledger();
-        let account = [0u8; 20];
         let url = "https://example.com";
-        ledger.register_project(account, url.into());
-        let project = ledger.get_project(account).unwrap();
+        let project_id = ledger.register_project(url.into());
+        let project = ledger.get_project(project_id).unwrap();
         assert_eq!(project.url, url);
         assert_eq!(project.members, vec![test_sender().to_fixed_bytes()]);
     }

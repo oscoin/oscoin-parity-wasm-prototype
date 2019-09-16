@@ -54,14 +54,14 @@ To use the client you need the `.oscoin_ledger_address` in your current working
 directory. This file is created by `osc-deploy`.
 
 ~~~rust
-let client = oscoin_client::Client::new_from_file().unwrap();
+let client = Client::new_from_file().unwrap();
 let sender = client.new_account().wait().unwrap();
-let project_address = Address::zero();
 let url = "https://example.com";
-client
-    .register_project(sender, project_address, url.to_string())
+let project_id = client
+    .register_project(sender, url.to_string())
     .wait()
     .unwrap();
+let project = client.get_project(project_id).wait().unwrap().unwrap();
 ~~~
 
 You can find a full example in `examples/project-registration.rs`

@@ -17,6 +17,7 @@ pub trait Env {
     fn write(&mut self, key: &H256, value: &[u8; 32]);
     fn read(&self, key: &H256) -> [u8; 32];
     fn sender(&self) -> Address;
+    fn block_number(&self) -> u64;
 }
 
 /// Implements [Env] for the Parity Wasm Smart Contract environment using the `pwasm_ethereum` crate.
@@ -33,6 +34,10 @@ impl Env for Pwasm {
 
     fn sender(&self) -> Address {
         pwasm_ethereum::sender()
+    }
+
+    fn block_number(&self) -> u64 {
+        pwasm_ethereum::block_number()
     }
 }
 
@@ -56,6 +61,7 @@ mod test_env {
     pub struct TestEnv {
         state: HashMap<H256, [u8; 32]>,
         pub sender: Address,
+        pub block_number: u64,
     }
 
     impl TestEnv {
@@ -78,6 +84,10 @@ mod test_env {
 
         fn sender(&self) -> Address {
             self.sender
+        }
+
+        fn block_number(&self) -> u64 {
+            self.block_number
         }
     }
 }

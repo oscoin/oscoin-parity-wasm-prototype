@@ -20,7 +20,9 @@ use web3::types::TransactionReceipt;
 pub use web3::types::{Address, H256, U256};
 use web3::Web3;
 
-use oscoin_ledger::{Call as LedgerCall, Query as LedgerQuery, Update as LedgerUpdate};
+use oscoin_ledger::{
+    compute_project_id, Call as LedgerCall, ProjectId, Query as LedgerQuery, Update as LedgerUpdate,
+};
 
 /// URL pointing to a parity ethereum node running on localhost.
 ///
@@ -155,20 +157,25 @@ impl Client {
         self.submit(sender, LedgerUpdate::CounterInc)
     }
 
-    pub fn register_project(&self, sender: Address, account: Address, url: String) -> SubmitResult {
-        self.submit(
-            sender,
-            LedgerUpdate::RegisterProject {
-                project_id: account.to_fixed_bytes(),
-                url,
-            },
-        )
+    pub fn register_project<'a>(
+        &'a self,
+        sender: Address,
+        url: String,
+    ) -> impl Future<Item = ProjectId, Error = ClientError> + 'a {
+        self.submit(sender, LedgerUpdate::RegisterProject { url })
+            .map(move |receipt| {
+                let block = receipt
+                    .block_number
+                    .expect("Receipt must have block number");
+                compute_project_id(sender.as_fixed_bytes().into(), block.as_u64())
+            })
     }
 
-    pub fn get_project(&self, account: Address) -> QueryResult<Option<oscoin_ledger::Project>> {
-        self.query(LedgerQuery::GetProject {
-            project_id: account.to_fixed_bytes(),
-        })
+    pub fn get_project(
+        &self,
+        project_id: ProjectId,
+    ) -> QueryResult<Option<oscoin_ledger::Project>> {
+        self.query(LedgerQuery::GetProject { project_id })
     }
 }
 

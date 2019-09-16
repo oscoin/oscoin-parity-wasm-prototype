@@ -26,7 +26,7 @@ pub trait Ledger {
 
     fn counter_value(&mut self) -> u32;
 
-    fn register_project(&mut self, project_id: ProjectId, url: String);
+    fn register_project(&mut self, url: String) -> ProjectId;
 
     fn get_project(&mut self, project_id: ProjectId) -> Option<Project>;
 }
@@ -58,7 +58,7 @@ pub enum Query {
 #[derive(Serialize, Deserialize, Clone)]
 pub enum Update {
     CounterInc,
-    RegisterProject { project_id: ProjectId, url: String },
+    RegisterProject { url: String },
 }
 
 impl Call {
@@ -95,9 +95,7 @@ pub fn dispatch(mut ledger: impl Ledger, call: Call) -> Vec<u8> {
         },
         Call::Update(update) => match update {
             Update::CounterInc => serde_cbor::to_vec(&ledger.counter_inc()),
-            Update::RegisterProject { project_id, url } => {
-                serde_cbor::to_vec(&ledger.register_project(project_id, url))
-            }
+            Update::RegisterProject { url } => serde_cbor::to_vec(&ledger.register_project(url)),
         },
     };
     res.expect("CBOR serialization never fails")
