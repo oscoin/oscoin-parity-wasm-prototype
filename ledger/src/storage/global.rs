@@ -38,7 +38,7 @@ impl<'a> Storage<'a> {
     }
 
     pub fn read<T: serde::de::DeserializeOwned>(
-        &mut self,
+        &self,
         key: &[u8],
     ) -> serde_cbor::Result<Option<T>> {
         let data = self.read_bytes(key);
@@ -66,7 +66,7 @@ impl<'a> Storage<'a> {
         }
     }
 
-    fn read_bytes(&mut self, key: &[u8]) -> Vec<u8> {
+    fn read_bytes(&self, key: &[u8]) -> Vec<u8> {
         let key_hash = pwasm_std::keccak(key);
         let mut data = Vec::new();
         let mut data_to_read = U256::from(self.env.read(&key_hash)).as_usize();

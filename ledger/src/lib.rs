@@ -13,7 +13,7 @@ pub mod storage;
 
 use interface::dispatch;
 pub use interface::{Call, Ledger, Project, ProjectId, Query, Update};
-use storage::Storage;
+use storage::{CounterStorage, Storage};
 
 pub fn call() {
     let ledger = Ledger_::new(pwasm::Pwasm);
@@ -41,9 +41,11 @@ impl Ledger_ {
     fn storage(&mut self) -> Storage {
         Storage::new(self.env.as_mut())
     }
-}
 
-const COUNTER_KEY: &[u8] = b"counter";
+    fn counter_storage(&mut self) -> CounterStorage {
+        CounterStorage::new(self.storage())
+    }
+}
 
 impl Ledger for Ledger_ {
     fn ping(&mut self) -> String {
@@ -51,12 +53,11 @@ impl Ledger for Ledger_ {
     }
 
     fn counter_inc(&mut self) {
-        let val: u32 = self.storage().read(COUNTER_KEY).unwrap().unwrap_or(0);
-        self.storage().write(COUNTER_KEY, &(val + 1));
+        self.counter_storage().update(|val| val + 1);
     }
 
     fn counter_value(&mut self) -> u32 {
-        self.storage().read(COUNTER_KEY).unwrap().unwrap_or(0)
+        self.counter_storage().get()
     }
 
     fn register_project(&mut self, url: String) -> ProjectId {
