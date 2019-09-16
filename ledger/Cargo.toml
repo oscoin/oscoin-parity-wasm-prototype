@@ -13,7 +13,13 @@ pwasm-ethereum = "0.8"
 pwasm-abi = "0.2"
 lazy_static = { version = "1.3.0", features = ["spin_no_std"] }
 serde = { version = "1.0", default-features = false, features = ["derive", "alloc"] }
-serde_cbor = { version = "=0.10.0", default-features = false, features = ["alloc"] }
+
+[dependencies.serde_cbor]
+# See https://github.com/oscoin/oscoin-parity-wasm-prototype/pull/45
+git = "https://github.com/pyfisch/cbor.git"
+rev = "2c7ed27f0ecf89cdf2883586ad40dde1f216df6e"
+default-features = false
+features = ["alloc"]
 
 [features]
 default = ["std"]
