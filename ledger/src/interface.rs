@@ -6,7 +6,6 @@
 //! [Query] or [Update] constructor. With [dispatch] the method corresponding to a given [Call] is
 //! called on a [Ledger] implementation.
 use crate::pwasm::String;
-use alloc::collections::BTreeSet;
 use alloc::prelude::v1::Vec;
 use serde::{Deserialize, Serialize};
 
@@ -17,6 +16,31 @@ pub type AccountId = [u8; 20];
 pub struct Project {
     pub url: String,
     pub members: Vec<AccountId>,
+}
+
+#[derive(Serialize, Deserialize, Default, Clone)]
+pub struct ProjectList {
+    pub(crate) projects: Vec<Project>,
+}
+
+impl ProjectList {
+    pub fn new() -> ProjectList {
+        ProjectList {
+            projects: Vec::new(),
+        }
+    }
+
+    pub fn insert(&mut self, project: Project) {
+        self.projects.push(project)
+    }
+
+    pub fn from_vec(vec: Vec<Project>) -> ProjectList {
+        ProjectList { projects: vec }
+    }
+
+    pub fn into_vec(self) -> Vec<Project> {
+        self.projects
+    }
 }
 
 /// Public interface of the oscoin ledger
@@ -31,7 +55,7 @@ pub trait Ledger {
 
     fn get_project(&mut self, project_id: ProjectId) -> Option<Project>;
 
-    fn list_projects(&mut self) -> BTreeSet<Project>;
+    fn list_projects(&mut self) -> ProjectList;
 }
 
 /// Represents a call to a ledger method. Either a [Query] or a [Update].

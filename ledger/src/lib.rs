@@ -2,8 +2,6 @@
 #![feature(alloc_prelude)]
 extern crate alloc;
 
-use alloc::collections::BTreeSet;
-
 use alloc::prelude::v1::*;
 use alloc::vec;
 
@@ -14,7 +12,7 @@ pub mod pwasm;
 pub mod storage;
 
 use interface::dispatch;
-pub use interface::{Call, Ledger, Project, ProjectId, Query, Update};
+pub use interface::{Call, Ledger, Project, ProjectId, ProjectList, Query, Update};
 use storage::Storage;
 
 pub fn call() {
@@ -65,7 +63,10 @@ impl Ledger for Ledger_ {
     fn register_project(&mut self, url: String) -> ProjectId {
         let members = vec![self.env.sender().to_fixed_bytes()];
         let project = Project { url, members };
-        let projects = BTreeSet::insert(&mut self.list_projects(), project.clone());
+
+        let mut projects = self.list_projects();
+        ProjectList::insert(&mut projects, project.clone());
+
         let id = compute_project_id(self.env.sender(), self.env.block_number());
         self.storage().write(&id, &project);
         self.storage().write(PROJECTS_KEY, &projects);
@@ -76,7 +77,7 @@ impl Ledger for Ledger_ {
         self.storage().read::<Project>(&account).unwrap()
     }
 
-    fn list_projects(&mut self) -> BTreeSet<Project> {
+    fn list_projects(&mut self) -> ProjectList {
         self.storage()
             .read(PROJECTS_KEY)
             .expect("Project list is successfully read from ledger")
