@@ -14,7 +14,9 @@ pub type AccountId = [u8; 20];
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Project {
-    pub url: String,
+    pub description: String,
+    pub name: String,
+    pub img_url: String,
     pub members: Vec<AccountId>,
 }
 
@@ -26,7 +28,8 @@ pub trait Ledger {
 
     fn counter_value(&mut self) -> u32;
 
-    fn register_project(&mut self, url: String) -> ProjectId;
+    fn register_project(&mut self, name: String, description: String, img_url: String)
+        -> ProjectId;
 
     fn get_project(&mut self, project_id: ProjectId) -> Option<Project>;
 }
@@ -58,7 +61,11 @@ pub enum Query {
 #[derive(Serialize, Deserialize, Clone)]
 pub enum Update {
     CounterInc,
-    RegisterProject { url: String },
+    RegisterProject {
+        name: String,
+        description: String,
+        img_url: String,
+    },
 }
 
 impl Call {
@@ -95,7 +102,11 @@ pub fn dispatch(mut ledger: impl Ledger, call: Call) -> Vec<u8> {
         },
         Call::Update(update) => match update {
             Update::CounterInc => serde_cbor::to_vec(&ledger.counter_inc()),
-            Update::RegisterProject { url } => serde_cbor::to_vec(&ledger.register_project(url)),
+            Update::RegisterProject {
+                name,
+                description,
+                img_url,
+            } => serde_cbor::to_vec(&ledger.register_project(name, description, img_url)),
         },
     };
     res.expect("CBOR serialization never fails")

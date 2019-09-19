@@ -160,15 +160,24 @@ impl Client {
     pub fn register_project<'a>(
         &'a self,
         sender: Address,
-        url: String,
+        name: String,
+        description: String,
+        img_url: String,
     ) -> impl Future<Item = ProjectId, Error = Error> + 'a {
-        self.submit(sender, LedgerUpdate::RegisterProject { url })
-            .map(move |receipt| {
-                let block = receipt
-                    .block_number
-                    .expect("Receipt must have block number");
-                compute_project_id(sender.as_fixed_bytes().into(), block.as_u64())
-            })
+        self.submit(
+            sender,
+            LedgerUpdate::RegisterProject {
+                name,
+                description,
+                img_url,
+            },
+        )
+        .map(move |receipt| {
+            let block = receipt
+                .block_number
+                .expect("Receipt must have block number");
+            compute_project_id(sender.as_fixed_bytes().into(), block.as_u64())
+        })
     }
 
     pub fn get_project(
