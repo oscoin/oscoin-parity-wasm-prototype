@@ -129,7 +129,8 @@ mod test {
         let name = "monokol";
         let description = "Looking glass into the future.";
         let img_url = "https://monok.el/img/logo.svg";
-        let project_id = ledger.register_project(name.into(), description.into(), img_url.into());
+        let project_id =
+            ledger.register_project(name.to_owned(), description.to_owned(), img_url.to_owned());
         let project = ledger.get_project(project_id).unwrap();
 
         assert_eq!(project.name, name);

@@ -33,9 +33,9 @@ fn register_project() {
     let project_id = client
         .register_project(
             sender,
-            name.to_string(),
-            description.to_string(),
-            img_url.to_string(),
+            name.to_owned(),
+            description.to_owned(),
+            img_url.to_owned(),
         )
         .wait()
         .unwrap();
