@@ -20,8 +20,10 @@ use web3::types::TransactionReceipt;
 pub use web3::types::{Address, H256, U256};
 use web3::Web3;
 
+pub use oscoin_ledger::interface::{AccountId, ProjectList};
 use oscoin_ledger::{
-    compute_project_id, Call as LedgerCall, ProjectId, Query as LedgerQuery, Update as LedgerUpdate,
+    compute_project_id, Call as LedgerCall, Project, ProjectId, Query as LedgerQuery,
+    Update as LedgerUpdate,
 };
 
 /// URL pointing to a parity ethereum node running on localhost.
@@ -176,6 +178,10 @@ impl Client {
         project_id: ProjectId,
     ) -> QueryResult<Option<oscoin_ledger::Project>> {
         self.query(LedgerQuery::GetProject { project_id })
+    }
+
+    pub fn list_projects(&self) -> QueryResult<Vec<Project>> {
+        self.query(LedgerQuery::ListProjects)
     }
 }
 
