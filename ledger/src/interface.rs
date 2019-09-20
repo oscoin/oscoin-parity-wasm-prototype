@@ -120,7 +120,7 @@ pub fn dispatch(mut ledger: impl Ledger, call: Call) -> Vec<u8> {
             Query::Ping => serde_cbor::to_vec(&ledger.ping()),
             Query::CounterValue => serde_cbor::to_vec(&ledger.counter_value()),
             Query::GetProject { project_id } => serde_cbor::to_vec(&ledger.get_project(project_id)),
-            Query::ListProjects => serde_cbor::to_vec(&ledger.list_projects()),
+            Query::ListProjects => serde_cbor::to_vec(&ledger.list_projects().into_vec()),
         },
         Call::Update(update) => match update {
             Update::CounterInc => serde_cbor::to_vec(&ledger.counter_inc()),

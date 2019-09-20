@@ -69,7 +69,6 @@ fn list_projects() {
         url_set,
         project_list
             .clone()
-            .into_vec()
             .iter()
             .map(|project| { project.url.clone() })
             .collect()
@@ -83,7 +82,6 @@ fn list_projects() {
     // that were registered in the ledger.
     assert_eq!(
         project_list
-            .into_vec()
             .iter()
             .map(|project| { project.members.clone() })
             .collect::<BTreeSet<Vec<AccountId>>>(),
