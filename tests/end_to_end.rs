@@ -58,14 +58,19 @@ fn list_projects() {
 
     let sender = client.new_account().wait().unwrap();
 
-    let url_vec: Vec<String> = (0..9)
-        .map(|ix| "https://examples".to_string() + &ix.to_string() + ".com")
+    let img_url_vec: Vec<String> = (0..9)
+        .map(|ix| "https://img.examples.com/".to_owned() + &ix.to_string())
         .collect();
-    let url_set: BTreeSet<String> = url_vec.iter().cloned().collect();
+    let img_url_set: BTreeSet<String> = img_url_vec.iter().cloned().collect();
 
-    for url in url_vec.iter().take(9) {
+    for url in img_url_vec.iter().take(9) {
         client
-            .register_project(sender, url.to_string())
+            .register_project(
+                sender,
+                "name".to_owned(),
+                "description".to_owned(),
+                url.to_owned(),
+            )
             .wait()
             .unwrap();
     }
@@ -76,11 +81,11 @@ fn list_projects() {
     // in the start.
     // Sets are used for ease of comparison and to remove duplicates.
     assert_eq!(
-        url_set,
+        img_url_set,
         project_list
             .clone()
             .iter()
-            .map(|project| { project.url.clone() })
+            .map(|project| { project.img_url.clone() })
             .collect()
     );
 
