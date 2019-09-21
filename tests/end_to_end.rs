@@ -58,12 +58,12 @@ fn list_projects() {
 
     let sender = client.new_account().wait().unwrap();
 
-    let img_url_vec: Vec<String> = (0..9)
+    let img_url_vec: Vec<String> = (0..7)
         .map(|ix| "https://img.examples.com/".to_owned() + &ix.to_string())
         .collect();
     let img_url_set: BTreeSet<String> = img_url_vec.iter().cloned().collect();
 
-    for url in img_url_vec.iter().take(9) {
+    for url in img_url_vec.iter().take(7) {
         client
             .register_project(
                 sender,
