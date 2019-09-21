@@ -20,10 +20,9 @@ use web3::types::TransactionReceipt;
 pub use web3::types::{Address, H256, U256};
 use web3::Web3;
 
-pub use oscoin_ledger::interface::{AccountId, ProjectList};
+pub use oscoin_ledger::interface::{AccountId, ProjectId};
 use oscoin_ledger::{
-    compute_project_id, Call as LedgerCall, Project, ProjectId, Query as LedgerQuery,
-    Update as LedgerUpdate,
+    compute_project_id, Call as LedgerCall, Project, Query as LedgerQuery, Update as LedgerUpdate,
 };
 
 /// URL pointing to a parity ethereum node running on localhost.
