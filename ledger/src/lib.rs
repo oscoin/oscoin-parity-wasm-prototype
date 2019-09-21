@@ -60,9 +60,19 @@ impl Ledger for Ledger_ {
         self.storage().read(COUNTER_KEY).unwrap().unwrap_or(0)
     }
 
-    fn register_project(&mut self, url: String) -> ProjectId {
+    fn register_project(
+        &mut self,
+        name: String,
+        description: String,
+        img_url: String,
+    ) -> ProjectId {
         let members = vec![self.env.sender().to_fixed_bytes()];
-        let project = Project { url, members };
+        let project = Project {
+            name,
+            description,
+            img_url,
+            members,
+        };
 
         let mut projects = self.list_projects();
         ProjectList::insert(&mut projects, project.clone());
@@ -70,6 +80,7 @@ impl Ledger for Ledger_ {
         let id = compute_project_id(self.env.sender(), self.env.block_number());
         self.storage().write(&id, &project);
         self.storage().write(PROJECTS_KEY, &projects);
+
         id
     }
 
@@ -126,10 +137,17 @@ mod test {
     #[test]
     fn register_project() {
         let mut ledger = new_ledger();
-        let url = "https://example.com";
-        let project_id = ledger.register_project(url.into());
+
+        let name = "monokol";
+        let description = "Looking glass into the future.";
+        let img_url = "https://monok.el/img/logo.svg";
+        let project_id =
+            ledger.register_project(name.to_owned(), description.to_owned(), img_url.to_owned());
         let project = ledger.get_project(project_id).unwrap();
-        assert_eq!(project.url, url);
+
+        assert_eq!(project.name, name);
+        assert_eq!(project.description, description);
+        assert_eq!(project.img_url, img_url);
         assert_eq!(project.members, vec![test_sender().to_fixed_bytes()]);
     }
 
