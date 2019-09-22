@@ -14,6 +14,7 @@ pub type AccountId = [u8; 20];
 
 #[derive(Serialize, Deserialize, Debug, Ord, Eq, PartialEq, PartialOrd, Clone)]
 pub struct Project {
+    pub id: ProjectId,
     pub description: String,
     pub name: String,
     pub img_url: String,
