@@ -6,7 +6,7 @@
 //! The tests will deploy the ledger contract to the node and submit transactions to it to test the
 //! counter.
 
-use oscoin_client::AccountId;
+use oscoin_client::{AccountId, ProjectId};
 use oscoin_deploy::dev_account_address;
 use std::collections::BTreeSet;
 use web3::futures::Future;
@@ -63,8 +63,10 @@ fn list_projects() {
         .collect();
     let img_url_set: BTreeSet<String> = img_url_vec.iter().cloned().collect();
 
+    let mut id_set: BTreeSet<ProjectId> = BTreeSet::new();
+
     for url in img_url_vec.iter().take(5) {
-        client
+        let id = client
             .register_project(
                 sender,
                 "name".to_owned(),
@@ -73,9 +75,17 @@ fn list_projects() {
             )
             .wait()
             .unwrap();
+
+        id_set.insert(id);
     }
 
     let project_list = client.list_projects().wait().unwrap();
+
+    // Check that ids are returned correctly per proejct.
+    assert_eq!(
+        id_set,
+        project_list.clone().iter().map(|p| p.id.clone()).collect()
+    );
 
     // Check that URLs of every listed project match those that were used
     // in the start.
