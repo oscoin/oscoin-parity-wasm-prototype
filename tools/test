@@ -1,0 +1,54 @@
+#!/bin/bash
+#
+# Build the ledger code as Wasm and prepare it for parity ethereum.
+#
+# Creates ./target/oscoin_ledger.wasm.
+#
+
+set pipefail
+GREEN='\033[1;92m'
+RED='\033[1;91m'
+# No Color
+NC='\033[0m'
+
+# Start by building every component of the project.
+cargo build --all
+
+# Then check formatting
+cargo fmt --all -- --check
+if [ $? -eq 1 ] ; then
+  echo -e "${RED}Rust formatting error. Please fix it before moving on.${NC}"
+  exit 1
+fi
+
+# Check linter. Some issues that can cause testing failures can sometimes
+# be caught e.g. variable shadowing or accidentally assigning "()" to a
+# variable where an actual non-trivial return type was expected.
+cargo clippy --all --all-targets
+if [ $? -eq 1 ] ; then
+  echo -e "${RED}Rust linter error. Please fix it before moving on.${NC}"
+  exit 1
+fi
+
+# Secondly, build the ledger.
+./tools/build-ledger-wasm
+
+# Check if tmux is installed. It will be used to run the tests later on.
+type -a "tmux"
+if [ $? -eq 1 ] ; then
+  echo -e "${RED}tmux is not available from your PATH variable. Perhaps it is not"\
+          "installed?${NC}"
+  exit 1
+fi
+
+# A tmux session with one window with two panes will be used: one for the
+# development node to run in, the other for cargo to run tests in.
+tmux new-session -d -s "testing" './dev-node/run'
+
+tmux set-window-option -t 'testing:0' remain-on-exit on
+
+# Wait for a few seconds the dev node to start, otherwise tests will fail with
+# "Connection refused".
+tmux split-window -d -h "sleep 3; ./tools/build-ledger-wasm && cargo test --all -- --test-threads=1; echo -e \"\nRun tests again with \n${GREEN}./tools/build-ledger-wasm && cargo test --all -- --test-threads=1${NC}\"; echo -e \"\nUse the tmux command prefix ${RED}M-B-:${NC} followed by ${RED}kill-session${NC} to exit.\"; bash"
+tmux select-pane -t:.1
+tmux attach
