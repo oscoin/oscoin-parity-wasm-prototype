@@ -49,6 +49,12 @@ tmux set-window-option -t 'testing:0' remain-on-exit on
 
 # Wait for a few seconds the dev node to start, otherwise tests will fail with
 # "Connection refused".
-tmux split-window -d -h "sleep 3; ./tools/build-ledger-wasm && cargo test --all -- --test-threads=1; echo -e \"\nRun tests again with \n${GREEN}./tools/build-ledger-wasm && cargo test --all -- --test-threads=1${NC}\"; echo -e \"\nUse the tmux command prefix ${RED}M-B-:${NC} followed by ${RED}kill-session${NC} to exit.\"; bash"
+tmux split-window -d -h "sleep 3;
+                         ./tools/build-ledger-wasm && cargo test --all -- --test-threads=1;\
+                         echo -e \"\n${GREEN}To rerun tests:${NC}\";\
+                         echo -e \"${GREEN}./tools/build-ledger-wasm && cargo test --all -- --test-threads=1${NC}\";\
+                         echo -e \"\n${RED}To exit:${NC}\";\
+                         echo -e \"Use the tmux command prefix ${RED}M-B-:${NC} followed by ${RED}kill-session${NC}.\n\";\
+                         bash"
 tmux select-pane -t:.1
 tmux attach
