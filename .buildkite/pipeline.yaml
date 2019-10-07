@@ -1,23 +1,29 @@
-env:
-  DOCKER_IMAGE: gcr.io/opensourcecoin/oscoin-pwasm-ci-base@sha256:038023f2a43f487759577e92874e43d066ea80a1e6ec6ebad08d7e4f8b2dddd5
-  DOCKER_FILE: ci/base-image/Dockerfile
-agents:
-  platform: "linux"
-  production: "true"
-
 steps:
-  - label: "Install components"
-    command: './tools/rustup-setup'
-  - label: "Check formatting"
-    command: 'cargo fmt --all -- --check'
+  env:
+    DOCKER_IMAGE: gcr.io/opensourcecoin/oscoin-pwasm-ci-base@sha256:038023f2a43f487759577e92874e43d066ea80a1e6ec6ebad08d7e4f8b2dddd5
+    DOCKER_FILE: ci/base-image/Dockerfile
+  agents:
+    platform: "linux"
+    production: "true"
+
+  - label: "Install components, check formatting"
+    commands:
+      - './tools/rustup-setup'
+      - 'cargo fmt --all -- --check'
+
   - label: "Build"
-    command: 'RUSTFLAGS="-D warnings" cargo build --all'
+    commands:
+      - 'RUSTFLAGS="-D warnings" cargo build --all'
+
   - label: "Build ledger"
-    command: 'RUSTFLAGS="-D warnings" ./tools/build-ledger-wasm'
+    commands:
+      - 'RUSTFLAGS="-D warnings" ./tools/build-ledger-wasm'
+
   - label: "Clippy"
-    command: 'cargo clippy --all --all-targets -- -D warnings'
-  - label: "Parity Ethereum Node"
-    background: true
-    command: './dev-node/run'
-  - label: "Test"
-    command: 'cargo test --all --color=always -- --test-threads=1'
+    commands:
+      - 'cargo clippy --all --all-targets -- -D warnings'
+
+  - label: "Run Parity Ethereum Node, and tests"
+    commands:
+      - './dev-node/run'
+      - 'cargo test --all --color=always -- --test-threads=1'
