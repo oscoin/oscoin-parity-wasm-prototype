@@ -1,15 +1,13 @@
 env:
-  DOCKER_FILE: .docker/build/Dockerfile
+  DOCKER_IMAGE: gcr.io/opensourcecoin/oscoin-pwasm-ci-base@sha256:038023f2a43f487759577e92874e43d066ea80a1e6ec6ebad08d7e4f8b2dddd5
+  DOCKER_FILE: ci/base-image/Dockerfile
 agents:
   platform: "linux"
   production: "true"
 
 steps:
   - label: "Install components"
-    command: |
-        rustup component add rustfmt
-        rustup component add clippy
-        rustup target add wasm32-unknown-unknown
+    command: './tools/rustup-setup'
   - label: "Check formatting"
     command: 'cargo fmt --all -- --check'
   - label: "Build"
