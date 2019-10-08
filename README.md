@@ -1,3 +1,5 @@
+[![Build status](https://badge.buildkite.com/67ab5ada52f2a9b06fa6ac8bf77093b5cb29dd0ef740839cd8.svg?=branch=buildkite)](https://buildkite.com/monadic/oscoin-parity-wasm-prototype)
+
 Oscoin Parity Ethereum WASM prototype
 =====================================
 

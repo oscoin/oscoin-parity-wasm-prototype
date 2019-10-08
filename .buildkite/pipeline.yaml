@@ -1,29 +1,25 @@
 steps:
-  env:
-    DOCKER_IMAGE: gcr.io/opensourcecoin/oscoin-pwasm-ci-base@sha256:038023f2a43f487759577e92874e43d066ea80a1e6ec6ebad08d7e4f8b2dddd5
-    DOCKER_FILE: ci/base-image/Dockerfile
-  agents:
-    platform: "linux"
-    production: "true"
-
-  - label: "Install components, check formatting"
+  - label: "Install components; check formatting; build; build the ledger, and run the linter"
     commands:
       - './tools/rustup-setup'
       - 'cargo fmt --all -- --check'
-
-  - label: "Build"
-    commands:
       - 'RUSTFLAGS="-D warnings" cargo build --all'
-
-  - label: "Build ledger"
-    commands:
       - 'RUSTFLAGS="-D warnings" ./tools/build-ledger-wasm'
-
-  - label: "Clippy"
-    commands:
       - 'cargo clippy --all --all-targets -- -D warnings'
+    env:
+      DOCKER_IMAGE: gcr.io/opensourcecoin/oscoin-pwasm-ci-base@sha256:038023f2a43f487759577e92874e43d066ea80a1e6ec6ebad08d7e4f8b2dddd5
+      DOCKER_FILE: ci/base-image/Dockerfile
+    agents:
+      platform: "linux"
+      production: "true"
 
-  - label: "Run Parity Ethereum Node, and tests"
+  - label: "Start a Parity Ethereum Node, and run tests"
     commands:
       - './dev-node/run'
       - 'cargo test --all --color=always -- --test-threads=1'
+    env:
+      DOCKER_IMAGE: gcr.io/opensourcecoin/oscoin-pwasm-ci-base@sha256:038023f2a43f487759577e92874e43d066ea80a1e6ec6ebad08d7e4f8b2dddd5
+      DOCKER_FILE: ci/base-image/Dockerfile
+    agents:
+      platform: "linux"
+      production: "true"
