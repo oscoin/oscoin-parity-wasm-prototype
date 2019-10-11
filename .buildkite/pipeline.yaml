@@ -1,6 +1,7 @@
 steps:
   - label: "Install components; check formatting; build; build the ledger, run the linter, start a Parity Ethereum node and run tests."
     commands:
+      - 'export CARGO_TARGET_DIR=/cache/cargo_target'
       - 'cargo build --package pwasm-utils-cli --bin wasm-build'
       - 'cargo fmt --all -- --check'
       - 'RUSTFLAGS="-D warnings" cargo build --all'
