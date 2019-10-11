@@ -9,7 +9,7 @@ steps:
       - './dev-node/run &'
       - 'cargo test --all --color=always -- --test-threads=1'
     env:
-      DOCKER_IMAGE: gcr.io/opensourcecoin/oscoin-pwasm-ci-base@sha256:e4d8ecc891144ffe8bb5342bb829d3eef22bb9176bf5ba9cf371a3c8a4271ce2
+      DOCKER_IMAGE: gcr.io/opensourcecoin/oscoin-pwasm-ci-base:latest
       DOCKER_FILE: ci/base-image/Dockerfile
     agents:
       platform: "linux"
