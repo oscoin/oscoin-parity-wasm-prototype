@@ -1,15 +1,13 @@
 steps:
   - label: "Install components; check formatting; build; build the ledger, run the linter, start a Parity Ethereum node and run tests."
     commands:
-      - 'export CARGO_TARGET_DIR=/cache/cargo-target-v2'
-      - 'rm -rf /cache/cargo-target-v1'
       - 'cargo build --package pwasm-utils-cli --bin wasm-build'
       - 'cargo fmt --all -- --check'
       - 'RUSTFLAGS="-D warnings" cargo build --all'
       - 'RUSTFLAGS="-D warnings" ./tools/build-ledger-wasm'
       - 'cargo clippy --all --all-targets -- -D warnings'
       - './dev-node/run &'
-      - 'cargo test --all --color=always -- --test-threads=1'
+#      - 'cargo test --all --color=always -- --test-threads=1'
     env:
       DOCKER_IMAGE: gcr.io/opensourcecoin/oscoin-pwasm-ci-base:latest
       DOCKER_FILE: ci/base-image/Dockerfile
