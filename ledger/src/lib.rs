@@ -66,8 +66,10 @@ impl Ledger for Ledger_ {
         description: String,
         img_url: String,
     ) -> ProjectId {
+        let id = compute_project_id(self.env.sender(), self.env.block_number());
         let members = vec![self.env.sender().to_fixed_bytes()];
         let project = Project {
+            id,
             name,
             description,
             img_url,
@@ -77,7 +79,6 @@ impl Ledger for Ledger_ {
         let mut projects = self.list_projects();
         ProjectList::insert(&mut projects, project.clone());
 
-        let id = compute_project_id(self.env.sender(), self.env.block_number());
         self.storage().write(&id, &project);
         self.storage().write(PROJECTS_KEY, &projects);
 
