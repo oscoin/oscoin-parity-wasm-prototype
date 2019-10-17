@@ -82,10 +82,7 @@ fn list_projects() {
     let project_list = client.list_projects().wait().unwrap();
 
     // Check that ids are returned correctly per proejct.
-    assert_eq!(
-        id_set,
-        project_list.clone().iter().map(|p| p.id.clone()).collect()
-    );
+    assert_eq!(id_set, project_list.clone().iter().map(|p| p.id).collect());
 
     // Check that URLs of every listed project match those that were used
     // in the start.
